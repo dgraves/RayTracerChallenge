@@ -8,8 +8,11 @@ find_package(Catch2 REQUIRED)
 
 add_executable(
     rtc
+    src/double_util.h
+    src/main.cpp
+    src/point.h
     src/tuple.h
-    src/main.cpp)
+    src/vector.h)
 
 target_compile_definitions(rtc PRIVATE -DNOMINMAX)
 

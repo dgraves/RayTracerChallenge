@@ -22,16 +22,10 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cinttypes>
-#include <cmath>
+#include "double_util.h"
 
 namespace rtc
 {
-    const double kEpsilon = 0.00001;
-    static inline bool Equal(double l, double r) { return std::abs(l - r) < kEpsilon; }
-    static inline double Square(double x) { return x * x; }
-
     class Tuple
     {
     public:
@@ -149,64 +143,5 @@ namespace rtc
         double y_;
         double z_;
         double w_;
-    };
-
-    class Point : public Tuple
-    {
-    public:
-        Point(double x, double y, double z) : Tuple(x, y, z, 1.0) {}
-    };
-
-    class Vector : public Tuple
-    {
-    public:
-        Vector(double x, double y, double z) : Tuple(x, y, z, 0.0) {}
-
-        // Compute the magnitude of the vector.
-        double Magnitude() const
-        {
-            return sqrt(rtc::Square(GetX()) + rtc::Square(GetY()) + rtc::Square(GetZ()) + rtc::Square(GetW()));
-        }
-
-        // Normalize the vector.
-        void Normalize()
-        {
-            double magnitude = Magnitude();
-            if (!rtc::Equal(magnitude, 0.0))
-            {
-                Divide(magnitude);
-            }
-        }
-
-        // Compute the dot product between two vectors (cosine of angle between them).  Equivalend to this . vector.
-        double Dot(const Vector& vector)
-        {
-            return ((GetX() * vector.GetX()) + (GetY() * vector.GetY()) + (GetZ() * vector.GetZ()));
-        }
-
-        static Vector Normalize(const Vector& vector)
-        {
-            double magnitude = vector.Magnitude();
-            if (!rtc::Equal(magnitude, 0.0))
-            {
-                return Vector(vector.GetX() / magnitude, vector.GetY() / magnitude, vector.GetZ() / magnitude);
-            }
-            else
-            {
-                return vector;
-            }
-        }
-
-        static double Dot(const Vector& lhs, const Vector& rhs)
-        {
-            return ((lhs.GetX() * rhs.GetX()) + (lhs.GetY() * rhs.GetY()) + (lhs.GetZ() * rhs.GetZ()));
-        }
-
-        static Vector Cross(const Vector& lhs, const Vector& rhs)
-        {
-            return Vector((lhs.GetY() * rhs.GetZ()) - (lhs.GetZ() * rhs.GetY()),
-                          (lhs.GetZ() * rhs.GetX()) - (lhs.GetX() * rhs.GetZ()),
-                          (lhs.GetX() * rhs.GetY()) - (lhs.GetY() * rhs.GetX()));
-        }
     };
 }

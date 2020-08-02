@@ -1,7 +1,10 @@
 #define CATCH_CONFIG_MAIN
 #include "catch2/catch.hpp"
 
+#include "double_util.h"
+#include "point.h"
 #include "tuple.h"
+#include "vector.h"
 
 SCENARIO("A tuple with w = 1.0 is a point", "[tuple]")
 {
