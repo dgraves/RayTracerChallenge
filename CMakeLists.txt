@@ -16,7 +16,7 @@ add_executable(
 
 target_compile_definitions(rtc PRIVATE -DNOMINMAX)
 
-add_executable(tests src/test.cpp)
+add_executable(tests src/main_test.cpp src/chapter1_test.cpp src/chapter2_test.cpp)
 target_link_libraries(tests Catch2::Catch2)
 
 include(CTest)
