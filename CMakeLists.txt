@@ -11,6 +11,12 @@ add_library(rtc_lib STATIC
     src/canvas.cpp
     src/color.h
     src/double_util.h
+    src/file_output_stream.h
+    src/file_output_stream.cpp
+    src/output_stream.h
+    src/memory_output_stream.h
+    src/ppm_writer.h
+    src/ppm_writer.cpp
     src/point.h
     src/tuple.h
     src/vector.h)

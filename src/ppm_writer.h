@@ -22,35 +22,23 @@
 
 #pragma once
 
-#include "color.h"
+#include "canvas.h"
+#include "output_stream.h"
 
 #include <cinttypes>
 #include <string>
-#include <vector>
 
 namespace rtc
 {
-    class Canvas
+    class PpmWriter
     {
     public:
-        Canvas(uint32_t width, uint32_t height);
+        static bool WriteFile(const std::string& filename, const Canvas& canvas);
 
-        uint32_t GetWidth() const { return width_; }
+        static bool WriteStream(OutputStream* stream, const Canvas& canvas);
 
-        uint32_t GetHeight() const { return height_; }
+        static bool WriteHeader(OutputStream* stream, uint32_t width, uint32_t height);
 
-        void WritePixel(uint32_t x, uint32_t y, const Color& color) { pixels_[y][x] = color; }
-
-        const Color& PixelAt(uint32_t x, uint32_t y) const { return pixels_[y][x]; }
-
-        void Clear(const Color& color);
-
-    private:
-        typedef std::vector<Color> PixelRow;
-
-    private:
-        uint32_t              width_;
-        uint32_t              height_;
-        std::vector<PixelRow> pixels_;
+        static bool WriteData(OutputStream* stream, const Canvas& canvas, uint32_t width, uint32_t height);
     };
 }

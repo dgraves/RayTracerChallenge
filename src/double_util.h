@@ -22,11 +22,21 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cinttypes>
 #include <cstdlib>
 
 namespace rtc
 {
     const double kEpsilon = 0.00001;
+
     static inline bool Equal(double l, double r) { return std::abs(l - r) < kEpsilon; }
-    static inline double Square(double x) { return x * x; }
+
+    static inline double Square(double d) { return d * d; }
+
+    static inline uint8_t ToByte(double d)
+    {
+        int32_t b = 255 * d;
+        return static_cast<uint8_t>((b < 0) ? 0 : (b > 255) ? 255 : b);
+    }
 }

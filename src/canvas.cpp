@@ -22,14 +22,29 @@
 
 #include "canvas.h"
 
-using namespace rtc;
+#include <fstream>
 
-Canvas::Canvas(uint32_t width, uint32_t height) :
-    width_(width),
-    height_(height)
+namespace rtc
 {
-    for (uint32_t i = 0; i < height; ++i)
+    Canvas::Canvas(uint32_t width, uint32_t height) :
+        width_(width),
+        height_(height)
     {
-        pixels_.emplace_back(PixelRow(width, Color(0.0, 0.0, 0.0)));
+        for (uint32_t i = 0; i < height; ++i)
+        {
+            pixels_.emplace_back(PixelRow(width, Color(0.0, 0.0, 0.0)));
+        }
     }
+
+    void Canvas::Clear(const Color& color)
+    {
+        for (auto& row : pixels_)
+        {
+            for (auto& pixel : row)
+            {
+                pixel = color;
+            }
+        }
+    }
+
 }

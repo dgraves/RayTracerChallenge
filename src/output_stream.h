@@ -22,35 +22,19 @@
 
 #pragma once
 
-#include "color.h"
-
-#include <cinttypes>
-#include <string>
-#include <vector>
+#include <cstddef>
 
 namespace rtc
 {
-    class Canvas
+    class OutputStream
     {
     public:
-        Canvas(uint32_t width, uint32_t height);
+        virtual ~OutputStream() { }
 
-        uint32_t GetWidth() const { return width_; }
+        virtual bool IsValid() = 0;
 
-        uint32_t GetHeight() const { return height_; }
+        virtual bool Fail() = 0;
 
-        void WritePixel(uint32_t x, uint32_t y, const Color& color) { pixels_[y][x] = color; }
-
-        const Color& PixelAt(uint32_t x, uint32_t y) const { return pixels_[y][x]; }
-
-        void Clear(const Color& color);
-
-    private:
-        typedef std::vector<Color> PixelRow;
-
-    private:
-        uint32_t              width_;
-        uint32_t              height_;
-        std::vector<PixelRow> pixels_;
+        virtual bool Write(const char* data, size_t size) = 0;
     };
 }
