@@ -20,8 +20,6 @@
 ** SOFTWARE.
 */
 
-#pragma once
-
 #include "ppm_writer.h"
 
 #include "color.h"

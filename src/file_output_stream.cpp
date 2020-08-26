@@ -20,8 +20,6 @@
 ** SOFTWARE.
 */
 
-#pragma once
-
 #include "file_output_stream.h"
 
 namespace rtc

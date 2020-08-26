@@ -25,7 +25,6 @@
 #include "color.h"
 
 #include <cinttypes>
-#include <string>
 #include <vector>
 
 namespace rtc
