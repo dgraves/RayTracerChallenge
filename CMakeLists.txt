@@ -14,6 +14,10 @@ add_library(rtc_lib STATIC
     src/file_output_stream.h
     src/file_output_stream.cpp
     src/output_stream.h
+    src/matrix.h
+    src/matrix22.h
+    src/matrix33.h
+    src/matrix44.h
     src/memory_output_stream.h
     src/ppm_writer.h
     src/ppm_writer.cpp
@@ -25,7 +29,7 @@ target_compile_definitions(rtc_lib PRIVATE -DNOMINMAX)
 add_executable(rtc src/main.cpp)
 target_link_libraries(rtc rtc_lib)
 
-add_executable(tests src/main_test.cpp src/chapter1_test.cpp src/chapter2_test.cpp)
+add_executable(tests src/main_test.cpp src/chapter1_test.cpp src/chapter2_test.cpp src/chapter3_test.cpp)
 target_link_libraries(tests rtc_lib Catch2::Catch2)
 
 include(CTest)
