@@ -23,6 +23,7 @@
 #pragma once
 
 #include "matrix.h"
+#include "ray.h"
 #include "tuple.h"
 
 #include <cmath>
@@ -169,6 +170,11 @@ namespace rtc
             }
 
             return Tuple(values[0], values[1], values[2], values[3]);
+        }
+
+        static Ray Transform(const Ray& ray, const Matrix& m)
+        {
+            return Ray(Multiply(m, ray.GetOrigin()), Multiply(m, ray.GetDirection()));
         }
 
         static bool IsInvertible(const Matrix44& matrix)

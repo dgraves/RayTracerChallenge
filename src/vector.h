@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "point.h"
 #include "tuple.h"
 
 #include <cmath>
@@ -36,6 +37,8 @@ namespace rtc
         Vector(const Tuple& tuple) : Tuple(tuple) {}
 
         Vector(Tuple&& tuple) : Tuple(std::move(tuple)) {}
+
+        Vector(const Point& point) : Tuple(point.GetX(), point.GetY(), point.GetZ(), 0.0) {}
 
         Vector(double x, double y, double z) : Tuple(x, y, z, 0.0) {}
 

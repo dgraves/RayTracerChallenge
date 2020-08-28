@@ -13,6 +13,8 @@ add_library(rtc_lib STATIC
     src/double_util.h
     src/file_output_stream.h
     src/file_output_stream.cpp
+    src/intersect.h
+    src/intersect.cpp
     src/output_stream.h
     src/matrix.h
     src/matrix22.h
@@ -22,6 +24,8 @@ add_library(rtc_lib STATIC
     src/ppm_writer.h
     src/ppm_writer.cpp
     src/point.h
+    src/sphere.h
+    src/ray.h
     src/tuple.h
     src/vector.h)
 target_compile_definitions(rtc_lib PRIVATE -DNOMINMAX)
@@ -34,7 +38,8 @@ add_executable(tests
     src/chapter1_test.cpp
     src/chapter2_test.cpp
     src/chapter3_test.cpp
-    src/chapter4_test.cpp)
+    src/chapter4_test.cpp
+    src/chapter5_test.cpp)
 target_link_libraries(tests rtc_lib Catch2::Catch2)
 
 include(CTest)
