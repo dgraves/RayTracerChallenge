@@ -386,9 +386,9 @@ SCENARIO("The dot product of two vectors", "[vector]")
     }
 }
 
-SCENARIO("The cross product of two vectors")
+SCENARIO("The cross product of two vectors", "[vector]")
 {
-    GIVEN("a <-vector(1, 2, 3) and b <- vector(2, 3, 4)")
+    GIVEN("a <- vector(1, 2, 3) and b <- vector(2, 3, 4)")
     {
         WHEN("The cross product is computed between a and b")
         {
