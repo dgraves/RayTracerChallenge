@@ -29,6 +29,12 @@ namespace rtc
     class Point : public Tuple
     {
     public:
+        Point() : Tuple(0.0, 0.0, 0.0, 1.0) {}
+
+        Point(const Tuple& tuple) : Tuple(tuple) {}
+
+        Point(Tuple&& tuple) : Tuple(std::move(tuple)) {}
+
         Point(double x, double y, double z) : Tuple(x, y, z, 1.0) {}
     };
 }

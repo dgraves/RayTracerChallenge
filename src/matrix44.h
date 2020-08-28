@@ -25,6 +25,7 @@
 #include "matrix.h"
 #include "tuple.h"
 
+#include <cmath>
 #include <stdexcept>
 
 namespace rtc
@@ -64,6 +65,74 @@ namespace rtc
                     {{ 0, 0, 1, 0 }},
                     {{ 0, 0, 0, 1 }}
                     }});
+        }
+
+        static Matrix44 Translation(double x, double y, double z)
+        {
+            Matrix44 transform = Identity();
+            transform.Set(0, 3, x);
+            transform.Set(1, 3, y);
+            transform.Set(2, 3, z);
+            return transform;
+        }
+
+        static Matrix44 Scaling(double x, double y, double z)
+        {
+            Matrix44 transform = Identity();
+            transform.Set(0, 0, x);
+            transform.Set(1, 1, y);
+            transform.Set(2, 2, z);
+            return transform;
+        }
+
+        // Rotation will appear to be clockwise around the corresponding axis when
+        // viewed along that axis, toward the negative end. (Left-hand rule).
+        static Matrix44 RotationX(double rad)
+        {
+            Matrix44 transform = Identity();
+            double cos_r = cos(rad);
+            double sin_r = sin(rad);
+            transform.Set(1, 1, cos_r);
+            transform.Set(1, 2, -sin_r);
+            transform.Set(2, 1, sin_r);
+            transform.Set(2, 2, cos_r);
+            return transform;
+        }
+
+        static Matrix44 RotationY(double rad)
+        {
+            Matrix44 transform = Identity();
+            double cos_r = cos(rad);
+            double sin_r = sin(rad);
+            transform.Set(0, 0, cos_r);
+            transform.Set(0, 2, sin_r);
+            transform.Set(2, 0, -sin_r);
+            transform.Set(2, 2, cos_r);
+            return transform;
+        }
+
+        static Matrix44 RotationZ(double rad)
+        {
+            Matrix44 transform = Identity();
+            double cos_r = cos(rad);
+            double sin_r = sin(rad);
+            transform.Set(0, 0, cos_r);
+            transform.Set(0, 1, -sin_r);
+            transform.Set(1, 0, sin_r);
+            transform.Set(1, 1, cos_r);
+            return transform;
+        }
+
+        static Matrix44 Shearing(double xy, double xz, double yx, double yz, double zx, double zy)
+        {
+            Matrix44 transform = Identity();
+            transform.Set(0, 1, xy);
+            transform.Set(0, 2, xz);
+            transform.Set(1, 0, yx);
+            transform.Set(1, 2, yz);
+            transform.Set(2, 0, zx);
+            transform.Set(2, 1, zy);
+            return transform;
         }
 
         static Matrix44 Multiply(const Matrix& lhs, const Matrix& rhs)

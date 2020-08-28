@@ -29,7 +29,12 @@ target_compile_definitions(rtc_lib PRIVATE -DNOMINMAX)
 add_executable(rtc src/main.cpp)
 target_link_libraries(rtc rtc_lib)
 
-add_executable(tests src/main_test.cpp src/chapter1_test.cpp src/chapter2_test.cpp src/chapter3_test.cpp)
+add_executable(tests
+    src/main_test.cpp
+    src/chapter1_test.cpp
+    src/chapter2_test.cpp
+    src/chapter3_test.cpp
+    src/chapter4_test.cpp)
 target_link_libraries(tests rtc_lib Catch2::Catch2)
 
 include(CTest)

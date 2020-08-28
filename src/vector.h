@@ -31,6 +31,12 @@ namespace rtc
     class Vector : public Tuple
     {
     public:
+        Vector() : Tuple(0.0, 0.0, 0.0, 0.0) {}
+
+        Vector(const Tuple& tuple) : Tuple(tuple) {}
+
+        Vector(Tuple&& tuple) : Tuple(std::move(tuple)) {}
+
         Vector(double x, double y, double z) : Tuple(x, y, z, 0.0) {}
 
         // Compute the magnitude of the vector.
