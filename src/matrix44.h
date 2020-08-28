@@ -23,7 +23,6 @@
 #pragma once
 
 #include "matrix.h"
-#include "matrix33.h"
 #include "tuple.h"
 
 #include <stdexcept>
@@ -55,35 +54,6 @@ namespace rtc
         Matrix44(std::array<std::array<double, 4>, 4>&& data) :
             Matrix(std::move(data))
         {
-        }
-
-        // Determinant of the submatrix.
-        double Minor(uint32_t row, uint32_t column) const
-        {
-            Matrix33 submatrix = Submatrix(row, column);
-            return submatrix.Determinant();
-        }
-
-        // Minor with a potential sign change.
-        double Cofactor(uint32_t row, uint32_t column) const
-        {
-            double d = Minor(row, column);
-
-            // If row + column is an odd number, negate the minor.
-            if ((row + column) & 0x1)
-            {
-                return -d;
-            }
-
-            return d;
-        }
-
-        double Determinant() const
-        {
-            return ((Get(0, 0) * Cofactor(0, 0)) +
-                    (Get(0, 1) * Cofactor(0, 1)) +
-                    (Get(0, 2) * Cofactor(0, 2)) +
-                    (Get(0, 3) * Cofactor(0, 3)));
         }
 
         static Matrix44 Identity()
@@ -130,21 +100,6 @@ namespace rtc
             }
 
             return Tuple(values[0], values[1], values[2], values[3]);
-        }
-
-        static double Minor(const Matrix44& matrix, uint32_t row, uint32_t column)
-        {
-            return matrix.Minor(row, column);
-        }
-
-        static double Cofactor(const Matrix44& matrix, uint32_t row, uint32_t column)
-        {
-            return matrix.Cofactor(row, column);
-        }
-
-        static double Determinant(const Matrix44& matrix)
-        {
-            return matrix.Determinant();
         }
 
         static bool IsInvertible(const Matrix44& matrix)

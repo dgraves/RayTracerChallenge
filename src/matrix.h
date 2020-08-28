@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <array>
 #include <cinttypes>
+#include <type_traits>
 
 namespace rtc
 {
@@ -99,8 +100,11 @@ namespace rtc
             }
         }
 
+        // Remove a row and column from the matrix.
         Matrix<Rows - 1, Columns - 1> Submatrix(uint32_t row, uint32_t column) const
         {
+            static_assert((Rows > 1) && (Columns > 1), "rtc::Matrix::Submatrix requires that both dimensions be greater than 1.");
+
             Matrix<Rows - 1, Columns - 1> submatrix;
 
             for (uint32_t sub_row = 0, current_row = 0; sub_row < (Rows - 1); ++sub_row, ++current_row)
@@ -124,8 +128,54 @@ namespace rtc
             return submatrix;
         }
 
+        template <uint32_t N = Rows, uint32_t M = Columns>
+        typename std::enable_if<((N == M) && (N == 2)), double>::type Determinant() const
+        {
+            return (Get(0, 0) * Get(1, 1)) - (Get(0, 1) * Get(1, 0));
+        }
+
+        template <uint32_t N = Rows, uint32_t M = Columns>
+        typename std::enable_if<!((N == M) && (N == 2)), double>::type Determinant() const
+        {
+            static_assert((Rows == Columns) && (Rows >= 2), "rtc::Matrix::Determinant is only implemented for square matrices with dimensions greater than 1x1.");
+
+            double determinant = 0.0;
+
+            for (uint32_t column = 0; column < Columns; ++column)
+            {
+                determinant += Get(0, column) * Cofactor(0, column);
+            }
+
+            return determinant;
+        }
+
+        // Determinant of the submatrix.
+        double Minor(uint32_t row, uint32_t column) const
+        {
+            static_assert((Rows == Columns) && (Rows >= 3), "rtc::Matrix::Determinant is only implemented for square matrices with dimensions greater than 2x2.");
+
+            Matrix<Rows - 1, Columns - 1> submatrix = Submatrix(row, column);
+            return submatrix.Determinant();
+        }
+
+        // Minor with a potential sign change.
+        double Cofactor(uint32_t row, uint32_t column) const
+        {
+            static_assert((Rows == Columns) && (Rows >= 3), "rtc::Matrix::Determinant is only implemented for square matrices with dimensions greater than 2x2.");
+
+            double d = Minor(row, column);
+
+            // If row + column is an odd number, negate the minor.
+            if ((row + column) & 0x1)
+            {
+                return -d;
+            }
+
+            return d;
+        }
+
         //
-        // Operations creating a new matrix object.
+        // Static operations that may create new matrix objects.
         //
 
         static bool Equal(const Matrix& lhs, const Matrix& rhs)
@@ -177,6 +227,21 @@ namespace rtc
         static Matrix<Rows - 1, Columns - 1> Submatrix(const Matrix& matrix, uint32_t row, uint32_t column)
         {
             return matrix.Submatrix(row, column);
+        }
+
+        static double Minor(const Matrix& matrix, uint32_t row, uint32_t column)
+        {
+            return matrix.Minor(row, column);
+        }
+
+        static double Cofactor(const Matrix& matrix, uint32_t row, uint32_t column)
+        {
+            return matrix.Cofactor(row, column);
+        }
+
+        static double Determinant(const Matrix& matrix)
+        {
+            return matrix.Determinant();
         }
 
     private:

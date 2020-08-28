@@ -23,7 +23,6 @@
 #pragma once
 
 #include "matrix.h"
-#include "matrix22.h"
 
 namespace rtc
 {
@@ -54,34 +53,6 @@ namespace rtc
         {
         }
 
-        // Determinant of the submatrix.
-        double Minor(uint32_t row, uint32_t column) const
-        {
-            Matrix22 submatrix = Submatrix(row, column);
-            return submatrix.Determinant();
-        }
-
-        // Minor with a potential sign change.
-        double Cofactor(uint32_t row, uint32_t column) const
-        {
-            double d = Minor(row, column);
-
-            // If row + column is an odd number, negate the minor.
-            if ((row + column) & 0x1)
-            {
-                return -d;
-            }
-
-            return d;
-        }
-
-        double Determinant() const
-        {
-            return ((Get(0, 0) * Cofactor(0, 0)) +
-                    (Get(0, 1) * Cofactor(0, 1)) +
-                    (Get(0, 2) * Cofactor(0, 2)));
-        }
-
         static Matrix33 Identity()
         {
             return Matrix33({{
@@ -89,21 +60,6 @@ namespace rtc
                     {{ 0, 1, 0 }},
                     {{ 0, 0, 1 }}
                     }});
-        }
-
-        static double Minor(const Matrix33& matrix, uint32_t row, uint32_t column)
-        {
-            return matrix.Minor(row, column);
-        }
-
-        static double Cofactor(const Matrix33& matrix, uint32_t row, uint32_t column)
-        {
-            return matrix.Cofactor(row, column);
-        }
-
-        static double Determinant(const Matrix33& matrix)
-        {
-            return matrix.Determinant();
         }
     };
 }

@@ -53,22 +53,12 @@ namespace rtc
         {
         }
 
-        double Determinant() const
-        {
-            return (Get(0, 0) * Get(1, 1)) - (Get(0, 1) * Get(1, 0));
-        }
-
         static Matrix22 Identity()
         {
             return Matrix22({{
                     {{ 1, 0 }},
                     {{ 0, 1 }}
                     }});
-        }
-
-        static double Determinant(const Matrix22& matrix)
-        {
-            return matrix.Determinant();
         }
     };
 }
