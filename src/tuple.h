@@ -41,7 +41,7 @@ namespace rtc
 
         bool IsPoint() const { return rtc::Equal(w_, 1.0); }
 
-        bool IsVector() const { return !IsPoint(); }
+        bool IsVector() const { return rtc::Equal(w_, 0.0); }
 
         //
         // Operations on the tuple object.
