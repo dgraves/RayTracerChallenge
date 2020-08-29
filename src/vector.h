@@ -65,6 +65,12 @@ namespace rtc
             return ((GetX() * vector.GetX()) + (GetY() * vector.GetY()) + (GetZ() * vector.GetZ()));
         }
 
+        // Reflect the vector around a normal vector.
+        void Reflect(const Vector& normal)
+        {
+            Subtract(Multiply(normal, 2.0 * Dot(normal)));
+        }
+
         static Vector Normalize(const Vector& vector)
         {
             double magnitude = vector.Magnitude();
@@ -81,6 +87,11 @@ namespace rtc
         static double Dot(const Vector& lhs, const Vector& rhs)
         {
             return ((lhs.GetX() * rhs.GetX()) + (lhs.GetY() * rhs.GetY()) + (lhs.GetZ() * rhs.GetZ()));
+        }
+
+        static Vector Reflect(const Vector& in, const Vector& normal)
+        {
+            return Subtract(in, Multiply(normal, 2.0 * Dot(in, normal)));
         }
 
         static Vector Cross(const Vector& lhs, const Vector& rhs)

@@ -22,8 +22,10 @@
 
 #pragma once
 
+#include "material.h"
 #include "matrix44.h"
 #include "point.h"
+#include "vector.h"
 
 namespace rtc
 {
@@ -31,11 +33,58 @@ namespace rtc
     {
     public:
         // Default construct a unit sphere.
-        Sphere() : transform_(rtc::Matrix44::Identity()), inverse_transform_(rtc::Matrix44::Identity()) {}
+        Sphere() :
+            transform_(rtc::Matrix44::Identity()),
+            inverse_transform_(rtc::Matrix44::Identity()),
+            transpose_inverse_transform_(rtc::Matrix44::Identity())
+        {
+        }
 
-        Sphere(const Matrix44& transform) { SetTransform(transform); }
+        Sphere(const Material& material) :
+            material_(material),
+            transform_(rtc::Matrix44::Identity()),
+            inverse_transform_(rtc::Matrix44::Identity()),
+            transpose_inverse_transform_(rtc::Matrix44::Identity())
+        {
+        }
 
-        Sphere(Matrix44&& transform) { SetTransform(std::move(transform)); }
+        Sphere(Material&& material) :
+            material_(std::move(material)),
+            transform_(rtc::Matrix44::Identity()),
+            inverse_transform_(rtc::Matrix44::Identity()),
+            transpose_inverse_transform_(rtc::Matrix44::Identity())
+        {
+        }
+
+        Sphere(const Matrix44& transform) :
+            transform_(transform)
+        {
+            ComputeInverseTransforms();
+        }
+
+        Sphere(Matrix44&& transform) :
+            transform_(std::move(transform))
+        {
+            ComputeInverseTransforms();
+        }
+
+        Sphere(const Material& material, const Matrix44& transform) :
+            material_(material),
+            transform_(transform)
+        {
+            ComputeInverseTransforms();
+        }
+
+        Sphere(Material&& material, Matrix44&& transform) :
+            material_(std::move(material)),
+            transform_(std::move(transform))
+        {
+            ComputeInverseTransforms();
+        }
+
+        const Material& GetMaterial() const { return material_; }
+
+        void SetMaterial(const Material& material) { material_ = material; }
 
         const Matrix44& GetTransform() const { return transform_; }
 
@@ -43,12 +92,39 @@ namespace rtc
 
         void SetTransform(const Matrix44& transform)
         {
-            transform_         = transform;
-            inverse_transform_ = rtc::Matrix44::Inverse(transform_);
+            transform_ = transform;
+            ComputeInverseTransforms();
+        }
+
+        Vector NormalAt(const Point& world_point)
+        {
+            // Convert from world space to object space to compute the normal as the vector
+            // between the point and the center of the sphere.
+            rtc::Point  object_point(rtc::Matrix44::Multiply(inverse_transform_, world_point));
+            rtc::Vector object_normal(object_point);
+            rtc::Vector world_normal(rtc::Matrix44::Multiply(transpose_inverse_transform_, object_normal));
+            world_normal.Normalize();
+            return world_normal;
         }
 
     private:
-        Matrix44 transform_;
-        Matrix44 inverse_transform_;
+        void ComputeInverseTransforms()
+        {
+            inverse_transform_ = rtc::Matrix44::Inverse(transform_);
+            transpose_inverse_transform_ = rtc::Matrix44::Transpose(inverse_transform_);
+
+            // If the original transform included translation, the normal computed with the
+            // transpose of the inverse transform could end up with a non-zero w component.
+            // The bottom row is cleared to avoid this.
+            transpose_inverse_transform_.Set(3, 0, 0.0);
+            transpose_inverse_transform_.Set(3, 1, 0.0);
+            transpose_inverse_transform_.Set(3, 2, 0.0);
+        }
+
+    private:
+        Material material_;                     ///< Material properties describing how the sphere shoule be shaded.
+        Matrix44 transform_;                    ///< Transform to determine the shape and position of the sphere.
+        Matrix44 inverse_transform_;            ///< Inverse of the transform to be applied to rays for intersection testing.
+        Matrix44 transpose_inverse_transform_;  ///< Transpose of the inverse of the transform for surface normal calculation.
     };
 }
