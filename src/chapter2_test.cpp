@@ -52,7 +52,7 @@ SCENARIO("Adding colors", "[color]")
     {
         WHEN("Colors are added")
         {
-            THEN("c1 + c2 == color(1, 1, 6, 1)")
+            THEN("c1 + c2 == color(1.6, 0.7, 1.0)")
             {
                 rtc::Color c1(0.9, 0.6, 0.75);
                 rtc::Color c2(0.7, 0.1, 0.25);
