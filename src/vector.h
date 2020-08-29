@@ -25,6 +25,7 @@
 #include "point.h"
 #include "tuple.h"
 
+#include <cassert>
 #include <cmath>
 
 namespace rtc
@@ -34,9 +35,9 @@ namespace rtc
     public:
         Vector() : Tuple(0.0, 0.0, 0.0, 0.0) {}
 
-        Vector(const Tuple& tuple) : Tuple(tuple) {}
+        Vector(const Tuple& tuple) : Tuple(tuple) { assert(IsVector()); }
 
-        Vector(Tuple&& tuple) : Tuple(std::move(tuple)) {}
+        Vector(Tuple&& tuple) : Tuple(std::move(tuple)) { assert(IsVector()); }
 
         Vector(const Point& point) : Tuple(point.GetX(), point.GetY(), point.GetZ(), 0.0) {}
 

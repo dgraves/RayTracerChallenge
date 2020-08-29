@@ -24,6 +24,8 @@
 
 #include "tuple.h"
 
+#include <cassert>
+
 namespace rtc
 {
     class Point : public Tuple
@@ -31,9 +33,9 @@ namespace rtc
     public:
         Point() : Tuple(0.0, 0.0, 0.0, 1.0) {}
 
-        Point(const Tuple& tuple) : Tuple(tuple) {}
+        Point(const Tuple& tuple) : Tuple(tuple) { assert(IsPoint()); }
 
-        Point(Tuple&& tuple) : Tuple(std::move(tuple)) {}
+        Point(Tuple&& tuple) : Tuple(std::move(tuple)) { assert(IsPoint()); }
 
         Point(double x, double y, double z) : Tuple(x, y, z, 1.0) {}
     };
