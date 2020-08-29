@@ -22,36 +22,17 @@
 
 #pragma once
 
-#include "double_util.h"
-#include "tuple.h"
-
-#include <cassert>
+#include "color.h"
+#include "material.h"
+#include "point.h"
+#include "point_light.h"
+#include "vector.h"
 
 namespace rtc
 {
-    class Color : public Tuple
+    class Phong
     {
     public:
-        Color() : Tuple(0.0, 0.0, 0.0, 0.0) {}
-
-        Color(const Tuple& tuple) : Tuple(tuple) { assert(rtc::Equal(GetW(), 0.0)); }
-
-        Color(Tuple&& tuple) : Tuple(std::move(tuple)) { assert(rtc::Equal(GetW(), 0.0)); }
-
-        Color(double r, double g, double b) : Tuple(r, g, b, 0.0) {}
-
-        double GetR() const { return GetX(); }
-
-        double GetG() const { return GetY(); }
-
-        double GetB() const { return GetZ(); }
-
-        static Color HadamardProduct(const Color& lhs, const Color& rhs)
-        {
-            return Color(
-                lhs.GetR() * rhs.GetR(),
-                lhs.GetG() * rhs.GetG(),
-                lhs.GetB() * rhs.GetB());
-        }
+        static Color Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eye, const Vector& normal);
     };
 }

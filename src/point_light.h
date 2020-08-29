@@ -22,36 +22,34 @@
 
 #pragma once
 
-#include "double_util.h"
-#include "tuple.h"
-
-#include <cassert>
+#include "color.h"
+#include "point.h"
 
 namespace rtc
 {
-    class Color : public Tuple
+    class PointLight
     {
     public:
-        Color() : Tuple(0.0, 0.0, 0.0, 0.0) {}
+        PointLight() {}
 
-        Color(const Tuple& tuple) : Tuple(tuple) { assert(rtc::Equal(GetW(), 0.0)); }
-
-        Color(Tuple&& tuple) : Tuple(std::move(tuple)) { assert(rtc::Equal(GetW(), 0.0)); }
-
-        Color(double r, double g, double b) : Tuple(r, g, b, 0.0) {}
-
-        double GetR() const { return GetX(); }
-
-        double GetG() const { return GetY(); }
-
-        double GetB() const { return GetZ(); }
-
-        static Color HadamardProduct(const Color& lhs, const Color& rhs)
+        PointLight(const Point& position, const Color& intensity) :
+            position_(position),
+            intensity_(intensity)
         {
-            return Color(
-                lhs.GetR() * rhs.GetR(),
-                lhs.GetG() * rhs.GetG(),
-                lhs.GetB() * rhs.GetB());
         }
+
+        PointLight(Point&& position, Color&& intensity) :
+            position_(std::move(position)),
+            intensity_(std::move(intensity))
+        {
+        }
+
+        const Point& GetPosition() const { return position_; }
+
+        const Color& GetIntensity() const { return intensity_; }
+
+    private:
+        Point position_;   ///< Position of the light.
+        Color intensity_;  ///< Brightness and color of the light.
     };
 }
