@@ -35,7 +35,7 @@ add_library(rtc_lib STATIC
 target_compile_definitions(rtc_lib PRIVATE -DNOMINMAX)
 
 add_executable(rtc src/main.cpp)
-target_link_libraries(rtc rtc_lib)
+target_link_libraries(rtc PRIVATE rtc_lib)
 
 add_executable(tests
     src/main_test.cpp
@@ -45,8 +45,8 @@ add_executable(tests
     src/chapter4_test.cpp
     src/chapter5_test.cpp
     src/chapter6_test.cpp)
-target_link_libraries(tests rtc_lib Catch2::Catch2)
+target_link_libraries(tests PRIVATE rtc_lib Catch2::Catch2)
 
 include(CTest)
-include(ParseAndAddCatchTests)
-ParseAndAddCatchTests(tests)
+include(Catch)
+catch_discover_tests(tests)
