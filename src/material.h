@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -31,11 +31,11 @@ namespace rtc
     {
     public:
         Material() :
-            color_(1.0, 1.0, 1.0),
-            ambient_(0.1),
-            diffuse_(0.9),
-            specular_(0.9),
-            shininess_(200.0)
+            color_(GetDefaultColor()),
+            ambient_(GetDefaultAmbient()),
+            diffuse_(GetDefaultDiffuse()),
+            specular_(GetDefaultSpecular()),
+            shininess_(GetDefaultShininess())
         {
         }
 
@@ -85,6 +85,16 @@ namespace rtc
                     rtc::Equal(lhs.specular_, rhs.specular_) &&
                     rtc::Equal(lhs.shininess_, rhs.shininess_));
         }
+
+        static Color GetDefaultColor() { return Color(1.0, 1.0, 1.0); };
+
+        static double GetDefaultAmbient() { return 0.1; };
+
+        static double GetDefaultDiffuse() { return 0.9; };
+
+        static double GetDefaultSpecular() { return 0.9; };
+
+        static double GetDefaultShininess() { return 200.0; };
 
     private:
         Color  color_;     ///< Color attribute for the Phong reflection model.

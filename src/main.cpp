@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -20,8 +20,10 @@
 ** SOFTWARE.
 */
 
+#include "camera.h"
 #include "canvas.h"
 #include "color.h"
+#include "double_util.h"
 #include "intersect.h"
 #include "material.h"
 #include "phong.h"
@@ -31,6 +33,7 @@
 #include "ray.h"
 #include "sphere.h"
 #include "vector.h"
+#include "world.h"
 
 #include <string>
 
@@ -81,7 +84,7 @@ void RenderSphere(const std::string& filename)
     // Parameters for a 'wall' to project the surface on and the render canvas.
     double wall_z        = 10.0;
     double wall_size     = 7.0;
-    double canvas_pixels = 100.0;
+    double canvas_pixels = 500.0;
     double pixel_size    = wall_size / canvas_pixels;
     double half          = wall_size / 2.0;
 
@@ -127,11 +130,94 @@ void RenderSphere(const std::string& filename)
     rtc::PpmWriter::WriteFile(filename, canvas);
 }
 
+// Render a scene, from Chapter 7 "Making a scene".
+void RenderScene(const std::string& filename)
+{
+    auto floor_material = rtc::Material(
+        rtc::Color(1.0, 0.9, 0.9),
+        rtc::Material::GetDefaultAmbient(),
+        rtc::Material::GetDefaultDiffuse(),
+        0.0,
+        rtc::Material::GetDefaultShininess());
+
+    auto world = rtc::World(
+        {
+            rtc::PointLight(rtc::Point(-10.0, 10.0, -10.0), rtc::Color(1.0, 1.0, 1.0))
+        },
+        {
+            // Parameters for the floor, constructed from an extremely flattened sphere with a matte texture.
+            rtc::Sphere(floor_material, rtc::Matrix44::Scaling(10.0, 0.01, 10.0)),
+
+            // Parameters for the left wall, with the same scale and color as the floor, but rotated and translated into place.
+            rtc::Sphere(
+                floor_material,
+                rtc::Matrix44::Multiply(
+                    rtc::Matrix44::Multiply(
+                        rtc::Matrix44::Multiply(
+                            rtc::Matrix44::Translation(0.0, 0.0, 5.0),
+                            rtc::Matrix44::RotationY(-rtc::kPi / 4.0)),
+                        rtc::Matrix44::RotationX(rtc::kPi / 2.0)),
+                    rtc::Matrix44::Scaling(10.0, 0.01, 10.0))),
+
+            // Parameters for the right wall, which is identical to the left, but rotated the opposite direction in y.
+            rtc::Sphere(
+                floor_material,
+                rtc::Matrix44::Multiply(
+                    rtc::Matrix44::Multiply(
+                        rtc::Matrix44::Multiply(
+                            rtc::Matrix44::Translation(0.0, 0.0, 5.0),
+                            rtc::Matrix44::RotationY(rtc::kPi / 4.0)),
+                        rtc::Matrix44::RotationX(rtc::kPi / 2.0)),
+                    rtc::Matrix44::Scaling(10.0, 0.01, 10.0))),
+
+            // Parameters for the large sphere in the middle, which is a unit sphere, translated upward slightly and colored green.
+            rtc::Sphere(
+                rtc::Material(
+                    rtc::Color(0.1, 1.0, 0.5),
+                    rtc::Material::GetDefaultAmbient(),
+                    0.7,
+                    0.3,
+                    rtc::Material::GetDefaultShininess()),
+                rtc::Matrix44::Translation(-0.5, 1.0, 0.5)),
+
+            // Parameters for the smaller green sphere on the right, which is scaled by half.
+            rtc::Sphere(
+                rtc::Material(
+                    rtc::Color(0.5, 1.0, 0.1),
+                    rtc::Material::GetDefaultAmbient(),
+                    0.7,
+                    0.3,
+                    rtc::Material::GetDefaultShininess()),
+                rtc::Matrix44::Multiply(rtc::Matrix44::Translation(1.5, 0.5, -0.5), rtc::Matrix44::Scaling(0.5, 0.5, 0.5))),
+
+            // Parameters for the smallest sphere, which is scaled by a third before being translated.
+            rtc::Sphere(
+                rtc::Material(
+                    rtc::Color(1.0, 0.8, 0.1),
+                    rtc::Material::GetDefaultAmbient(),
+                    0.7,
+                    0.3,
+                    rtc::Material::GetDefaultShininess()),
+                rtc::Matrix44::Multiply(rtc::Matrix44::Translation(-1.5, 0.33, -0.75), rtc::Matrix44::Scaling(0.33, 0.33, 0.33)))
+        });
+
+    // Construct the camera and render the world.
+    auto from   = rtc::Point(0.0, 1.5, -5.0);
+    auto to     = rtc::Point(0.0, 1.0, 0.0);
+    auto up     = rtc::Vector(0.0, 1.0, 0.0);
+    auto camera = rtc::Camera(1000u, 500u, rtc::kPi / 3.0, rtc::Matrix44::ViewTransform(from, to, up));
+    auto canvas = camera.Render(world);
+
+    rtc::PpmWriter::WriteFile(filename, canvas);
+}
+
 int main()
 {
     RenderSphereSilhouette("silhouette.ppm");
 
     RenderSphere("sphere.ppm");
+
+    RenderScene("scene.ppm");
 
     return 0;
 }

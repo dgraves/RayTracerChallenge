@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -27,15 +27,21 @@
 #include "tuple.h"
 #include "vector.h"
 
+#include <algorithm>
 #include <cmath>
 
 namespace rtc
 {
-    bool Intersect::TestIntersect(Sphere* sphere, const Ray& ray)
+    static bool IntersectionCompare(const Intersect::Intersection& lhs, const Intersect::Intersection& rhs)
+    {
+        return (lhs.t < rhs.t);
+    }
+
+    void Intersect::TestIntersect(const Sphere* sphere, const Ray& ray)
     {
         if (sphere == nullptr)
         {
-            return false;
+            return;
         }
 
         // Transform ray to the sphere's object space.
@@ -56,7 +62,7 @@ namespace rtc
         // When discriminant is less than 0, the ray did not intersect the sphere.
         if (discriminant < 0.0)
         {
-            return false;
+            return;
         }
 
         // Compute intersetcion 'times'.  For the tangent case, return the same value twice.
@@ -65,10 +71,39 @@ namespace rtc
         double t1 = (-b - sqrt_d) * two_a;
         double t2 = (-b + sqrt_d) * two_a;
 
-        values_.emplace_back(Intersection{ t1, sphere });
-        values_.emplace_back(Intersection{ t2, sphere });
+        // Insert in sorted order.
+        if (t1 < t2)
+        {
+            values_.emplace_back(Intersection{ t1, sphere });
+            values_.emplace_back(Intersection{ t2, sphere });
+        }
+        else
+        {
+            values_.emplace_back(Intersection{ t2, sphere });
+            values_.emplace_back(Intersection{ t1, sphere });
+        }
+    }
 
-        return true;
+    void Intersect::TestIntersect(const World& world, const Ray& ray)
+    {
+        size_t count = world.GetObjectCount();
+
+        for (size_t i = 0; i < count; ++i)
+        {
+            auto& object = world.GetObject(i);
+            TestIntersect(&object, ray);
+        }
+
+        if (!values_.empty())
+        {
+            Sort(values_);
+        }
+    }
+
+    void Intersect::Sort(Intersections& intersections)
+    {
+        // Maintain original ordering of intersections with the same t value.
+        std::stable_sort(intersections.begin(), intersections.end(), IntersectionCompare);
     }
 
     const Intersect::Intersection* Intersect::Hit(const Intersections& intersections)
@@ -77,10 +112,9 @@ namespace rtc
 
         if (!intersections.empty())
         {
-            size_t i = 0;
-
-            // Find the first non-negative value.
-            for (; i < intersections.size(); ++i)
+            // Find the first non-negative value.  Because hits are sorted by t,
+            // this is also the first hit.
+            for (size_t i = 0; i < intersections.size(); ++i)
             {
                 auto current = &intersections[i];
 
@@ -88,21 +122,6 @@ namespace rtc
                 {
                     hit = current;
                     break;
-                }
-            }
-
-            // If there were no non-negative values in the intersection list, hit will be nullptr.
-            if (hit != nullptr)
-            {
-                ++i;
-                for (; i < intersections.size(); ++i)
-                {
-                    auto current = &intersections[i];
-
-                    if ((current->t >= 0) && (current->t < hit->t))
-                    {
-                        hit = current;
-                    }
                 }
             }
         }

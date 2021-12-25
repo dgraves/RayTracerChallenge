@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -24,6 +24,7 @@
 
 #include "ray.h"
 #include "sphere.h"
+#include "world.h"
 
 #include <vector>
 
@@ -34,8 +35,8 @@ namespace rtc
     public:
         struct Intersection
         {
-            double  t{ 0.0 };           ///< Value representing intersection 'time'.
-            Sphere* object{ nullptr };  ///< Pointer to intersected object.
+            double        t{ 0.0 };           ///< Value representing intersection 'time'.
+            const Sphere* object{ nullptr };  ///< Pointer to intersected object.
         };
 
         typedef std::vector<Intersection> Intersections;
@@ -43,13 +44,17 @@ namespace rtc
     public:
         Intersect() : hit_(nullptr) { }
 
-        Intersect(Sphere* sphere, const Ray& ray) : hit_(nullptr) { TestIntersect(sphere, ray); }
+        Intersect(const Sphere* sphere, const Ray& ray) : hit_(nullptr) { TestIntersect(sphere, ray); }
+
+        Intersect(const World& world, const Ray& ray) : hit_(nullptr) { TestIntersect(world, ray); }
 
         size_t GetCount() const { return values_.size(); }
 
         const Intersection& GetValue(size_t index) const { return values_[index]; }
 
-        bool Test(Sphere* sphere, const Ray& ray) { Reset(); TestIntersect(sphere, ray); }
+        void Test(const Sphere* sphere, const Ray& ray) { Reset(); TestIntersect(sphere, ray); }
+
+        void Test(const World& world, const Ray& ray) { Reset(); TestIntersect(world, ray); }
 
         const Intersection* Hit()
         {
@@ -61,12 +66,16 @@ namespace rtc
             return hit_;
         }
 
+        static void Sort(Intersections& intersections);
+
         static const Intersection* Hit(const Intersections& intersections);
 
     private:
         void Reset() { hit_ = nullptr; values_.clear(); }
 
-        bool TestIntersect(Sphere* sphere, const Ray& ray);
+        void TestIntersect(const Sphere* sphere, const Ray& ray);
+
+        void TestIntersect(const World& world, const Ray& ray);
 
     private:
         Intersections       values_;    ///< Values representing intersection 'times'.

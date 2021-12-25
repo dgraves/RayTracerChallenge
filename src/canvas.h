@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -39,6 +39,8 @@ namespace rtc
         uint32_t GetHeight() const { return height_; }
 
         void WritePixel(uint32_t x, uint32_t y, const Color& color) { pixels_[y][x] = color; }
+
+        void WritePixel(uint32_t x, uint32_t y, Color&& color) { pixels_[y][x] = std::move(color); }
 
         const Color& PixelAt(uint32_t x, uint32_t y) const { return pixels_[y][x]; }
 

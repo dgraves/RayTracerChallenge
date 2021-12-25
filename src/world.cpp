@@ -8,7 +8,7 @@
 ** copies of the Software, and to permit persons to whom the Software is
 ** furnished to do so, subject to the following conditions :
 **
-** The above copyright noticeand this permission notice shall be included in all
+** The above copyright notice and this permission notice shall be included in all
 ** copies or substantial portions of the Software.
 **
 ** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -20,42 +20,28 @@
 ** SOFTWARE.
 */
 
-#pragma once
+#include "world.h"
 
-#include "color.h"
-#include "point.h"
+#include "phong.h"
+
+#include <cassert>
 
 namespace rtc
 {
-    class PointLight
+    World World::GetDefault()
     {
-    public:
-        PointLight() {}
-
-        PointLight(const Point& position, const Color& intensity) :
-            position_(position),
-            intensity_(intensity)
-        {
-        }
-
-        PointLight(Point&& position, Color&& intensity) :
-            position_(std::move(position)),
-            intensity_(std::move(intensity))
-        {
-        }
-
-        const Point& GetPosition() const { return position_; }
-
-        const Color& GetIntensity() const { return intensity_; }
-
-        static bool Equal(const PointLight& lhs, const PointLight& rhs)
-        {
-            return (Point::Equal(lhs.position_, rhs.position_) &&
-                    Color::Equal(lhs.intensity_, rhs.intensity_));
-        }
-
-    private:
-        Point position_;   ///< Position of the light.
-        Color intensity_;  ///< Brightness and color of the light.
-    };
+        return World(
+            {
+                PointLight(rtc::Point(-10.0, 10.0, -10.0), rtc::Color(1.0, 1.0, 1.0))
+            },
+            {
+                Sphere(rtc::Material(
+                    rtc::Color(0.8, 1.0, 0.6),
+                    rtc::Material::GetDefaultAmbient(),
+                    0.7,
+                    0.2,
+                    rtc::Material::GetDefaultShininess())),
+                Sphere(rtc::Matrix44::Scaling(0.5, 0.5, 0.5))
+            });
+    }
 }

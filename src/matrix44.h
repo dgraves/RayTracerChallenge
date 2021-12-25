@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -23,8 +23,10 @@
 #pragma once
 
 #include "matrix.h"
+#include "point.h"
 #include "ray.h"
 #include "tuple.h"
+#include "vector.h"
 
 #include <cmath>
 #include <stdexcept>
@@ -134,6 +136,22 @@ namespace rtc
             transform.Set(2, 0, zx);
             transform.Set(2, 1, zy);
             return transform;
+        }
+
+        static Matrix44 ViewTransform(const Point& from, const Point& to, const Vector& up)
+        {
+            auto forward     = Vector::Normalize(rtc::Vector::Subtract(to, from));
+            auto up_norm     = Vector::Normalize(up);
+            auto left        = Vector::Cross(forward, up_norm);
+            auto true_up     = Vector::Cross(left, forward);
+            auto orientation = Matrix44({{
+                {{ left.GetX(), left.GetY(), left.GetZ(), 0 }},
+                {{ true_up.GetX(), true_up.GetY(), true_up.GetZ(), 0 }},
+                {{ -forward.GetX(), -forward.GetY(), -forward.GetZ(), 0 }},
+                {{ 0, 0, 0, 1}}
+                }});
+
+            return rtc::Matrix44::Multiply(orientation, rtc::Matrix44::Translation(-from.GetX(), -from.GetY(), -from.GetZ()));
         }
 
         static Matrix44 Multiply(const Matrix& lhs, const Matrix& rhs)

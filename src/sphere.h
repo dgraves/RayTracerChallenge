@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -96,7 +96,7 @@ namespace rtc
             ComputeInverseTransforms();
         }
 
-        Vector NormalAt(const Point& world_point)
+        Vector NormalAt(const Point& world_point) const
         {
             // Convert from world space to object space to compute the normal as the vector
             // between the point and the center of the sphere.
@@ -105,6 +105,12 @@ namespace rtc
             rtc::Vector world_normal(rtc::Matrix44::Multiply(transpose_inverse_transform_, object_normal));
             world_normal.Normalize();
             return world_normal;
+        }
+
+        static bool Equal(const Sphere& lhs, const Sphere& rhs)
+        {
+            return (Material::Equal(lhs.material_, rhs.material_) &&
+                    Matrix44::Equal(lhs.transform_, rhs.transform_));
         }
 
     private:

@@ -7,9 +7,12 @@ list(APPEND CMAKE_PREFIX_PATH "external/Catch2")
 find_package(Catch2 REQUIRED)
 
 add_library(rtc_lib STATIC
+    src/camera.h
+    src/camera.cpp
     src/canvas.h
     src/canvas.cpp
     src/color.h
+    src/computations.h
     src/double_util.h
     src/file_output_stream.h
     src/file_output_stream.cpp
@@ -31,7 +34,9 @@ add_library(rtc_lib STATIC
     src/sphere.h
     src/ray.h
     src/tuple.h
-    src/vector.h)
+    src/vector.h
+    src/world.h
+    src/world.cpp)
 target_compile_definitions(rtc_lib PRIVATE -DNOMINMAX)
 
 add_executable(rtc src/main.cpp)
@@ -44,7 +49,8 @@ add_executable(tests
     src/chapter3_test.cpp
     src/chapter4_test.cpp
     src/chapter5_test.cpp
-    src/chapter6_test.cpp)
+    src/chapter6_test.cpp
+    src/chapter7_test.cpp)
 target_link_libraries(tests PRIVATE rtc_lib Catch2::Catch2)
 
 include(CTest)

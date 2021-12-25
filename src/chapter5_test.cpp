@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -238,6 +238,7 @@ SCENARIO("The hit, when all intersections have positive t", "[ray]")
                 rtc::Intersect::Intersection  i2{ 2, &s };
                 rtc::Intersect::Intersections xs{ i2, i1 };
 
+                rtc::Intersect::Sort(xs);
                 auto i = rtc::Intersect::Hit(xs);
 
                 REQUIRE(i != nullptr);
