@@ -20,8 +20,6 @@
 ** SOFTWARE.
 */
 
-#pragma once
-
 #include "phong.h"
 
 #include <cmath>
