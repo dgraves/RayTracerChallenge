@@ -152,22 +152,18 @@ void RenderScene(const std::string& filename)
             rtc::Sphere(
                 floor_material,
                 rtc::Matrix44::Multiply(
-                    rtc::Matrix44::Multiply(
-                        rtc::Matrix44::Multiply(
-                            rtc::Matrix44::Translation(0.0, 0.0, 5.0),
-                            rtc::Matrix44::RotationY(-rtc::kPi / 4.0)),
-                        rtc::Matrix44::RotationX(rtc::kPi / 2.0)),
+                    rtc::Matrix44::Translation(0.0, 0.0, 5.0),
+                    rtc::Matrix44::RotationY(-rtc::kPi / 4.0),
+                    rtc::Matrix44::RotationX(rtc::kPi / 2.0),
                     rtc::Matrix44::Scaling(10.0, 0.01, 10.0))),
 
             // Parameters for the right wall, which is identical to the left, but rotated the opposite direction in y.
             rtc::Sphere(
                 floor_material,
                 rtc::Matrix44::Multiply(
-                    rtc::Matrix44::Multiply(
-                        rtc::Matrix44::Multiply(
-                            rtc::Matrix44::Translation(0.0, 0.0, 5.0),
-                            rtc::Matrix44::RotationY(rtc::kPi / 4.0)),
-                        rtc::Matrix44::RotationX(rtc::kPi / 2.0)),
+                    rtc::Matrix44::Translation(0.0, 0.0, 5.0),
+                    rtc::Matrix44::RotationY(rtc::kPi / 4.0),
+                    rtc::Matrix44::RotationX(rtc::kPi / 2.0),
                     rtc::Matrix44::Scaling(10.0, 0.01, 10.0))),
 
             // Parameters for the large sphere in the middle, which is a unit sphere, translated upward slightly and colored green.

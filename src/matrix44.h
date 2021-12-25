@@ -154,7 +154,7 @@ namespace rtc
             return rtc::Matrix44::Multiply(orientation, rtc::Matrix44::Translation(-from.GetX(), -from.GetY(), -from.GetZ()));
         }
 
-        static Matrix44 Multiply(const Matrix& lhs, const Matrix& rhs)
+        static Matrix44 Multiply(const Matrix44& lhs, const Matrix44& rhs)
         {
             Matrix44 result;
 
@@ -174,7 +174,13 @@ namespace rtc
             return result;
         }
 
-        static Tuple Multiply(const Matrix& lhs, const Tuple& rhs)
+        template <typename... Rest>
+        static Matrix44 Multiply(const Matrix44& first, const Matrix44& second, Rest... rest)
+        {
+            return Multiply(Multiply(first, second), rest...);
+        }
+
+        static Tuple Multiply(const Matrix44& lhs, const Tuple& rhs)
         {
             double values[4];
 
@@ -190,7 +196,7 @@ namespace rtc
             return Tuple(values[0], values[1], values[2], values[3]);
         }
 
-        static Ray Transform(const Ray& ray, const Matrix& m)
+        static Ray Transform(const Ray& ray, const Matrix44& m)
         {
             return Ray(Multiply(m, ray.GetOrigin()), Multiply(m, ray.GetDirection()));
         }
