@@ -67,6 +67,6 @@ namespace rtc
         }
 
         // Add the three contributions together to get the final shading.
-        return Color::Add(ambient, Color::Add(diffuse, specular));
+        return Color::Add(ambient, diffuse, specular);
     }
 }

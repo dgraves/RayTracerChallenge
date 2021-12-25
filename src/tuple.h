@@ -123,9 +123,21 @@ namespace rtc
             return Tuple(lhs.x_ + rhs.x_, lhs.y_ + rhs.y_, lhs.z_ + rhs.z_, lhs.w_ + rhs.w_);
         }
 
+        template <typename... Rest>
+        static Tuple Add(const Tuple& first, const Tuple& second, Rest... rest)
+        {
+            return Add(Add(first, second), rest...);
+        }
+
         static Tuple Subtract(const Tuple& lhs, const Tuple& rhs)
         {
             return Tuple(lhs.x_ - rhs.x_, lhs.y_ - rhs.y_, lhs.z_ - rhs.z_, lhs.w_ - rhs.w_);
+        }
+
+        template <typename... Rest>
+        static Tuple Subtract(const Tuple& first, const Tuple& second, Rest... rest)
+        {
+            return Subtract(Subtract(first, second), rest...);
         }
 
         static Tuple Multiply(const Tuple& tuple, double scalar)
