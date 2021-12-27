@@ -34,8 +34,8 @@ namespace rtc
     class World
     {
     public:
-        typedef std::vector<PointLight> Lights;
-        typedef std::vector<Sphere>     Objects;
+        using Lights  = std::vector<PointLight>;
+        using Objects = std::vector<Sphere>;
 
     public:
         World()

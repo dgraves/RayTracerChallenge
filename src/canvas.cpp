@@ -28,9 +28,9 @@ namespace rtc
         width_(width),
         height_(height)
     {
-        for (uint32_t i = 0; i < height; ++i)
+        for (uint32_t i = 0u; i < height; ++i)
         {
-            pixels_.emplace_back(PixelRow(width, Color(0.0, 0.0, 0.0)));
+            pixels_.emplace_back(PixelRow(width, Color{ 0.0, 0.0, 0.0 }));
         }
     }
 

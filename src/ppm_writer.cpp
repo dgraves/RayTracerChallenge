@@ -30,13 +30,13 @@
 
 namespace rtc
 {
-    const uint32_t    kMaxLineLength = 70;
-    const std::string kMagicNumber   = "P3\n";
-    const std::string kMaxColorValue = "255\n";
+    const auto kMaxLineLength = 70u;
+    const auto kMagicNumber   = std::string{ "P3\n" };
+    const auto kMaxColorValue = std::string{ "255\n" };
 
     bool PpmWriter::WriteFile(const std::string& filename, const Canvas& canvas)
     {
-        FileOutputStream stream(filename);
+        auto stream = FileOutputStream{ filename };
 
         if (stream.IsValid())
         {
@@ -48,12 +48,12 @@ namespace rtc
 
     bool PpmWriter::WriteStream(OutputStream* stream, const Canvas& canvas)
     {
-        bool success = false;
+        auto success = false;
 
         if (stream != nullptr)
         {
-            uint32_t    width  = canvas.GetWidth();
-            uint32_t    height = canvas.GetHeight();
+            const auto width  = canvas.GetWidth();
+            const auto height = canvas.GetHeight();
 
             success = WriteHeader(stream, width, height);
             success = success && WriteData(stream, canvas, width, height);
@@ -65,12 +65,12 @@ namespace rtc
 
     bool PpmWriter::WriteHeader(OutputStream* stream, uint32_t width, uint32_t height)
     {
-        bool success = false;
+        auto success = false;
 
         if (stream != nullptr)
         {
             // Write "plain" PPM header.
-            std::string dim = std::to_string(width);
+            auto dim = std::to_string(width);
             dim += ' ';
             dim += std::to_string(height);
             dim += '\n';
@@ -85,20 +85,20 @@ namespace rtc
 
     bool PpmWriter::WriteData(OutputStream* stream, const Canvas& canvas, uint32_t width, uint32_t height)
     {
-        bool success = false;
+        auto success = false;
 
         if (stream != nullptr)
         {
-            std::string line;
-            size_t      start = 0;
+            auto   line  = std::string{};
+            size_t start = 0;
 
             success = true;
 
-            for (uint32_t y = 0; y < height; ++y)
+            for (uint32_t y = 0u; y < height; ++y)
             {
-                for (uint32_t x = 0; x < width; ++x)
+                for (uint32_t x = 0u; x < width; ++x)
                 {
-                    const Color& pixel = canvas.PixelAt(x, y);
+                    const auto pixel = canvas.PixelAt(x, y);
 
                     line += std::to_string(rtc::ToByte(pixel.GetR()));
                     line += ' ';
@@ -129,7 +129,7 @@ namespace rtc
                     }
                 }
 
-                size_t length = line.length() - start;
+                auto length = line.length() - start;
                 if (length > 0)
                 {
                     // Convert the space charactrer at the end of the line to a new line character.

@@ -45,19 +45,19 @@ namespace rtc
         }
 
         // Transform ray to the sphere's object space.
-        rtc::Ray transformed_ray = rtc::Matrix44::Transform(ray, sphere->GetInverseTransform());
+        const auto transformed_ray = rtc::Matrix44::Transform(ray, sphere->GetInverseTransform());
 
         // Compute the vector from the sphere's center to the transformed ray's origin.
         // The sphere's center is at (0, 0, 0), so a vector constructed from the ray's origin
         // is the same as the vector produced by (ray_origin - sphere_origin).
-        rtc::Vector sphere_to_ray(transformed_ray.GetOrigin());
-        rtc::Vector ray_direction = transformed_ray.GetDirection();
+        const auto sphere_to_ray = rtc::Vector{ transformed_ray.GetOrigin() };
+        const auto ray_direction = transformed_ray.GetDirection();
 
-        double a = rtc::Vector::Dot(ray_direction, ray_direction);
-        double b = 2.0 * rtc::Vector::Dot(ray_direction, sphere_to_ray);
-        double c = rtc::Vector::Dot(sphere_to_ray, sphere_to_ray) - 1.0;
+        const auto a = rtc::Vector::Dot(ray_direction, ray_direction);
+        const auto b = 2.0 * rtc::Vector::Dot(ray_direction, sphere_to_ray);
+        const auto c = rtc::Vector::Dot(sphere_to_ray, sphere_to_ray) - 1.0;
 
-        double discriminant = rtc::Square(b) - 4.0 * a * c;
+        const auto discriminant = rtc::Square(b) - 4.0 * a * c;
 
         // When discriminant is less than 0, the ray did not intersect the sphere.
         if (discriminant < 0.0)
@@ -66,10 +66,10 @@ namespace rtc
         }
 
         // Compute intersetcion 'times'.  For the tangent case, return the same value twice.
-        double two_a  = 1.0 / (2.0 * a);
-        double sqrt_d = sqrt(discriminant);
-        double t1 = (-b - sqrt_d) * two_a;
-        double t2 = (-b + sqrt_d) * two_a;
+        const auto two_a  = 1.0 / (2.0 * a);
+        const auto sqrt_d = sqrt(discriminant);
+        const auto t1     = (-b - sqrt_d) * two_a;
+        const auto t2     = (-b + sqrt_d) * two_a;
 
         // Insert in sorted order.
         if (t1 < t2)
@@ -86,11 +86,11 @@ namespace rtc
 
     void Intersect::TestIntersect(const World& world, const Ray& ray)
     {
-        size_t count = world.GetObjectCount();
+        const auto count = world.GetObjectCount();
 
-        for (size_t i = 0; i < count; ++i)
+        for (size_t i = 0u; i < count; ++i)
         {
-            auto& object = world.GetObject(i);
+            const auto& object = world.GetObject(i);
             TestIntersect(&object, ray);
         }
 
@@ -114,9 +114,9 @@ namespace rtc
         {
             // Find the first non-negative value.  Because hits are sorted by t,
             // this is also the first hit.
-            for (size_t i = 0; i < intersections.size(); ++i)
+            for (size_t i = 0u; i < intersections.size(); ++i)
             {
-                auto current = &intersections[i];
+                const auto current = &intersections[i];
 
                 if (current->t >= 0)
                 {

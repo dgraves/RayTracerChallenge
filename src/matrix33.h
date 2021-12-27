@@ -43,7 +43,7 @@ namespace rtc
         {
         }
 
-        Matrix33(double data[3][3]) :
+        Matrix33(const double data[3][3]) :
             Matrix(data)
         {
         }
@@ -55,11 +55,11 @@ namespace rtc
 
         static Matrix33 Identity()
         {
-            return Matrix33({{
-                    {{ 1, 0, 0 }},
-                    {{ 0, 1, 0 }},
-                    {{ 0, 0, 1 }}
-                    }});
+            return Matrix33{ {{
+                    {{ 1.0, 0.0, 0.0 }},
+                    {{ 0.0, 1.0, 0.0 }},
+                    {{ 0.0, 0.0, 1.0 }}
+                    }} };
         }
     };
 }

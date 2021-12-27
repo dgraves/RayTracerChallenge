@@ -52,7 +52,7 @@ namespace rtc
         // Normalize the vector.
         void Normalize()
         {
-            double magnitude = Magnitude();
+            const auto magnitude = Magnitude();
             if (!rtc::Equal(magnitude, 0.0))
             {
                 Divide(magnitude);
@@ -73,7 +73,7 @@ namespace rtc
 
         static Vector Normalize(const Vector& vector)
         {
-            double magnitude = vector.Magnitude();
+            const auto magnitude = vector.Magnitude();
             if (!rtc::Equal(magnitude, 0.0))
             {
                 return Vector(vector.GetX() / magnitude, vector.GetY() / magnitude, vector.GetZ() / magnitude);

@@ -38,7 +38,7 @@ namespace rtc
 
     static inline uint8_t ToByte(double d)
     {
-        int32_t b = 255 * d;
+        auto b = static_cast<int32_t>(255.0 * d);
         return static_cast<uint8_t>((b < 0) ? 0 : (b > 255) ? 255 : b);
     }
 

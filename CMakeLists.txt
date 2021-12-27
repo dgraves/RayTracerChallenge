@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.15.0)
 
 project(RayTracerChallenge LANGUAGES CXX VERSION 0.0.1)
 
+if(NOT "${CMAKE_CXX_STANDARD}")
+  set(CMAKE_CXX_STANDARD 20)
+endif()
+
 list(APPEND CMAKE_PREFIX_PATH "external/Catch2")
 
 find_package(Catch2 REQUIRED)

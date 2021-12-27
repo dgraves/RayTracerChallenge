@@ -86,7 +86,7 @@ namespace rtc
                     rtc::Equal(lhs.shininess_, rhs.shininess_));
         }
 
-        static Color GetDefaultColor() { return Color(1.0, 1.0, 1.0); };
+        static Color GetDefaultColor() { return Color{ 1.0, 1.0, 1.0 }; };
 
         static double GetDefaultAmbient() { return 0.1; };
 

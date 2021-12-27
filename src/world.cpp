@@ -30,18 +30,19 @@ namespace rtc
 {
     World World::GetDefault()
     {
-        return World(
+        return World{
             {
-                PointLight(rtc::Point(-10.0, 10.0, -10.0), rtc::Color(1.0, 1.0, 1.0))
+                PointLight{ rtc::Point{ -10.0, 10.0, -10.0 }, rtc::Color{ 1.0, 1.0, 1.0} }
             },
             {
-                Sphere(rtc::Material(
-                    rtc::Color(0.8, 1.0, 0.6),
-                    rtc::Material::GetDefaultAmbient(),
-                    0.7,
-                    0.2,
-                    rtc::Material::GetDefaultShininess())),
-                Sphere(rtc::Matrix44::Scaling(0.5, 0.5, 0.5))
-            });
+                Sphere{
+                    rtc::Material{
+                        rtc::Color{ 0.8, 1.0, 0.6 },
+                        rtc::Material::GetDefaultAmbient(),
+                        0.7,
+                        0.2,
+                        rtc::Material::GetDefaultShininess() } },
+                Sphere{ rtc::Matrix44::Scaling(0.5, 0.5, 0.5) }
+            } };
     }
 }

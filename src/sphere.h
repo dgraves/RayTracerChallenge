@@ -86,6 +86,8 @@ namespace rtc
 
         void SetMaterial(const Material& material) { material_ = material; }
 
+        void SetMaterial(Material&& material) { material_ = std::move(material); }
+
         const Matrix44& GetTransform() const { return transform_; }
 
         const Matrix44& GetInverseTransform() const { return inverse_transform_; }
@@ -96,13 +98,19 @@ namespace rtc
             ComputeInverseTransforms();
         }
 
+        void SetTransform(Matrix44&& transform)
+        {
+            transform_ = std::move(transform);
+            ComputeInverseTransforms();
+        }
+
         Vector NormalAt(const Point& world_point) const
         {
             // Convert from world space to object space to compute the normal as the vector
             // between the point and the center of the sphere.
-            rtc::Point  object_point(rtc::Matrix44::Multiply(inverse_transform_, world_point));
-            rtc::Vector object_normal(object_point);
-            rtc::Vector world_normal(rtc::Matrix44::Multiply(transpose_inverse_transform_, object_normal));
+            const auto object_point  = rtc::Point{ rtc::Matrix44::Multiply(inverse_transform_, world_point) };
+            const auto object_normal = rtc::Vector{ object_point };
+            auto       world_normal  = rtc::Vector{ rtc::Matrix44::Multiply(transpose_inverse_transform_, object_normal) };
             world_normal.Normalize();
             return world_normal;
         }
@@ -116,15 +124,15 @@ namespace rtc
     private:
         void ComputeInverseTransforms()
         {
-            inverse_transform_ = rtc::Matrix44::Inverse(transform_);
+            inverse_transform_           = rtc::Matrix44::Inverse(transform_);
             transpose_inverse_transform_ = rtc::Matrix44::Transpose(inverse_transform_);
 
             // If the original transform included translation, the normal computed with the
             // transpose of the inverse transform could end up with a non-zero w component.
             // The bottom row is cleared to avoid this.
-            transpose_inverse_transform_.Set(3, 0, 0.0);
-            transpose_inverse_transform_.Set(3, 1, 0.0);
-            transpose_inverse_transform_.Set(3, 2, 0.0);
+            transpose_inverse_transform_.Set(3u, 0u, 0.0);
+            transpose_inverse_transform_.Set(3u, 1u, 0.0);
+            transpose_inverse_transform_.Set(3u, 2u, 0.0);
         }
 
     private:

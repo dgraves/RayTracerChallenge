@@ -39,11 +39,11 @@ namespace rtc
         {
         }
 
-        Matrix(double data[Rows][Columns])
+        Matrix(const double data[Rows][Columns])
         {
-            for (uint32_t row = 0; row < Rows; ++row)
+            for (uint32_t row = 0u; row < Rows; ++row)
             {
-                for (uint32_t column = 0; column < Columns; ++column)
+                for (uint32_t column = 0u; column < Columns; ++column)
                 {
                     data_[row][column] = data[row][column];
                 }
@@ -69,9 +69,9 @@ namespace rtc
 
         bool Equal(const Matrix& rhs) const
         {
-            for (uint32_t row = 0; row < Rows; ++row)
+            for (uint32_t row = 0u; row < Rows; ++row)
             {
-                for (uint32_t column = 0; column < Columns; ++column)
+                for (uint32_t column = 0u; column < Columns; ++column)
                 {
                     if (!rtc::Equal(data_[row][column], rhs.data_[row][column]))
                     {
@@ -85,9 +85,9 @@ namespace rtc
 
         void Transpose()
         {
-            for (uint32_t row = 0; row < Rows; ++row)
+            for (uint32_t row = 0u; row < Rows; ++row)
             {
-                for (uint32_t column = 0; column < Columns; ++column)
+                for (uint32_t column = 0u; column < Columns; ++column)
                 {
                     // Stop at diagonal.
                     if (row == column)
@@ -101,20 +101,20 @@ namespace rtc
         }
 
         // Remove a row and column from the matrix.
-        Matrix<Rows - 1, Columns - 1> Submatrix(uint32_t row, uint32_t column) const
+        Matrix<Rows - 1u, Columns - 1u> Submatrix(uint32_t row, uint32_t column) const
         {
-            static_assert((Rows > 1) && (Columns > 1), "rtc::Matrix::Submatrix requires that both dimensions be greater than 1.");
+            static_assert((Rows > 1u) && (Columns > 1u), "rtc::Matrix::Submatrix requires that both dimensions be greater than 1.");
 
-            Matrix<Rows - 1, Columns - 1> submatrix;
+            auto submatrix = Matrix<Rows - 1u, Columns - 1u>{};
 
-            for (uint32_t sub_row = 0, current_row = 0; sub_row < (Rows - 1); ++sub_row, ++current_row)
+            for (uint32_t sub_row = 0u, current_row = 0u; sub_row < (Rows - 1u); ++sub_row, ++current_row)
             {
                 if (current_row == row)
                 {
                     ++current_row;
                 }
 
-                for (uint32_t sub_column = 0, current_column = 0; sub_column < (Columns - 1); ++sub_column, ++current_column)
+                for (uint32_t sub_column = 0u, current_column = 0u; sub_column < (Columns - 1u); ++sub_column, ++current_column)
                 {
                     if (current_column == column)
                     {
@@ -129,21 +129,21 @@ namespace rtc
         }
 
         template <uint32_t N = Rows, uint32_t M = Columns>
-        typename std::enable_if<((N == M) && (N == 2)), double>::type Determinant() const
+        typename std::enable_if<((N == M) && (N == 2u)), double>::type Determinant() const
         {
-            return (Get(0, 0) * Get(1, 1)) - (Get(0, 1) * Get(1, 0));
+            return (Get(0u, 0u) * Get(1u, 1u)) - (Get(0u, 1u) * Get(1u, 0u));
         }
 
         template <uint32_t N = Rows, uint32_t M = Columns>
-        typename std::enable_if<!((N == M) && (N == 2)), double>::type Determinant() const
+        typename std::enable_if<!((N == M) && (N == 2u)), double>::type Determinant() const
         {
-            static_assert((Rows == Columns) && (Rows >= 2), "rtc::Matrix::Determinant is only implemented for square matrices with dimensions greater than 1x1.");
+            static_assert((Rows == Columns) && (Rows >= 2u), "rtc::Matrix::Determinant is only implemented for square matrices with dimensions greater than 1x1.");
 
-            double determinant = 0.0;
+            auto determinant = 0.0;
 
-            for (uint32_t column = 0; column < Columns; ++column)
+            for (uint32_t column = 0u; column < Columns; ++column)
             {
-                determinant += Get(0, column) * Cofactor(0, column);
+                determinant += Get(0u, column) * Cofactor(0u, column);
             }
 
             return determinant;
@@ -152,21 +152,21 @@ namespace rtc
         // Determinant of the submatrix.
         double Minor(uint32_t row, uint32_t column) const
         {
-            static_assert((Rows == Columns) && (Rows >= 3), "rtc::Matrix::Determinant is only implemented for square matrices with dimensions greater than 2x2.");
+            static_assert((Rows == Columns) && (Rows >= 3u), "rtc::Matrix::Determinant is only implemented for square matrices with dimensions greater than 2x2.");
 
-            Matrix<Rows - 1, Columns - 1> submatrix = Submatrix(row, column);
+            const auto submatrix = Submatrix(row, column);
             return submatrix.Determinant();
         }
 
         // Minor with a potential sign change.
         double Cofactor(uint32_t row, uint32_t column) const
         {
-            static_assert((Rows == Columns) && (Rows >= 3), "rtc::Matrix::Determinant is only implemented for square matrices with dimensions greater than 2x2.");
+            static_assert((Rows == Columns) && (Rows >= 3u), "rtc::Matrix::Determinant is only implemented for square matrices with dimensions greater than 2x2.");
 
-            double d = Minor(row, column);
+            auto d = Minor(row, column);
 
             // If row + column is an odd number, negate the minor.
-            if ((row + column) & 0x1)
+            if ((row + column) & 0x01u)
             {
                 return -d;
             }
@@ -180,9 +180,9 @@ namespace rtc
 
         static bool Equal(const Matrix& lhs, const Matrix& rhs)
         {
-            for (uint32_t row = 0; row < Rows; ++row)
+            for (uint32_t row = 0u; row < Rows; ++row)
             {
-                for (uint32_t column = 0; column < Columns; ++column)
+                for (uint32_t column = 0u; column < Columns; ++column)
                 {
                     if (!rtc::Equal(lhs.data_[row][column], rhs.data_[row][column]))
                     {
@@ -196,11 +196,11 @@ namespace rtc
 
         static Matrix Identity()
         {
-            Matrix identity;
+            auto identity = Matrix{};
 
-            for (uint32_t row = 0; row < Rows; ++row)
+            for (uint32_t row = 0u; row < Rows; ++row)
             {
-                for (uint32_t column = 0; column < Columns; ++column)
+                for (uint32_t column = 0u; column < Columns; ++column)
                 {
                     identity.data_[row][column] = (row != column) ? 0.0 : 1.0;
                 }
@@ -211,11 +211,11 @@ namespace rtc
 
         static Matrix Transpose(const Matrix& matrix)
         {
-            Matrix transpose;
+            auto transpose = Matrix{};
 
-            for (uint32_t row = 0; row < Rows; ++row)
+            for (uint32_t row = 0u; row < Rows; ++row)
             {
-                for (uint32_t column = 0; column < Columns; ++column)
+                for (uint32_t column = 0u; column < Columns; ++column)
                 {
                     transpose.Set(column, row, matrix.Get(row, column));
                 }
@@ -224,7 +224,7 @@ namespace rtc
             return transpose;
         }
 
-        static Matrix<Rows - 1, Columns - 1> Submatrix(const Matrix& matrix, uint32_t row, uint32_t column)
+        static Matrix<Rows - 1u, Columns - 1u> Submatrix(const Matrix& matrix, uint32_t row, uint32_t column)
         {
             return matrix.Submatrix(row, column);
         }
@@ -245,7 +245,7 @@ namespace rtc
         }
 
     private:
-        typedef std::array<double, Columns> Row;
+        using Row = std::array<double, Columns>;
 
     private:
         std::array<Row, Rows> data_;

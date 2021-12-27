@@ -39,7 +39,7 @@ namespace rtc
             const Sphere* object{ nullptr };  ///< Pointer to intersected object.
         };
 
-        typedef std::vector<Intersection> Intersections;
+        using Intersections = std::vector<Intersection>;
 
     public:
         Intersect() : hit_(nullptr) { }

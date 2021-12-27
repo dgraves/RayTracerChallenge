@@ -34,12 +34,12 @@ SCENARIO("Creating and querying a ray", "[ray]")
 {
     GIVEN("origin <- point(1, 2, 3) and direction <- vector(4, 5, 6)")
     {
-        rtc::Point  origin(1, 2, 3);
-        rtc::Vector direction(4, 5, 6);
+        const auto origin    = rtc::Point{ 1.0, 2.0, 3.0 };
+        const auto direction = rtc::Vector{ 4.0, 5.0, 6.0 };
 
         WHEN("r <- ray(origin, direction)")
         {
-            rtc::Ray r(origin, direction);
+            const auto r = rtc::Ray{ origin, direction };
 
             THEN("r.origin = origin and r.direction = direction")
             {
@@ -54,16 +54,16 @@ SCENARIO("Computing a point from a distance", "[ray]")
 {
     GIVEN("r <- ray(point(2, 3, 4), vector(1, 0, 0))")
     {
-        rtc::Ray r(rtc::Point(2, 3, 4), rtc::Vector(1, 0, 0));
+        const auto r = rtc::Ray{ rtc::Point{ 2.0, 3.0, 4.0 }, rtc::Vector{ 1.0, 0.0, 0.0 } };
 
         WHEN("Computing a position)")
         {
             THEN("position(r, 0) = point(2, 3, 4) and position(r, 1) = point(3, 3, 4) and position(r, -1) = point(1, 3, 4) and position(r, 2.5) = point(4.5, 3, 4)")
             {
-                REQUIRE(rtc::Tuple::Equal(r.GetPosition(0), rtc::Point(2, 3, 4)));
-                REQUIRE(rtc::Tuple::Equal(r.GetPosition(1), rtc::Point(3, 3, 4)));
-                REQUIRE(rtc::Tuple::Equal(r.GetPosition(-1), rtc::Point(1, 3, 4)));
-                REQUIRE(rtc::Tuple::Equal(r.GetPosition(2.5), rtc::Point(4.5, 3, 4)));
+                REQUIRE(rtc::Tuple::Equal(r.GetPosition(0.0), rtc::Point{ 2.0, 3.0, 4.0 }));
+                REQUIRE(rtc::Tuple::Equal(r.GetPosition(1.0), rtc::Point{ 3.0, 3.0, 4.0 }));
+                REQUIRE(rtc::Tuple::Equal(r.GetPosition(-1.0), rtc::Point{ 1.0, 3.0, 4.0 }));
+                REQUIRE(rtc::Tuple::Equal(r.GetPosition(2.5), rtc::Point{ 4.5, 3.0, 4.0 }));
             }
         }
     }
@@ -73,12 +73,12 @@ SCENARIO("A ray intersects a sphere at two points", "[ray]")
 {
     GIVEN("r <- ray(point(0, 0, -5), vector(0, 0, 1)) and s <- sphere()")
     {
-        rtc::Ray       r(rtc::Point(0, 0, -5), rtc::Vector(0, 0, 1));
-        rtc::Sphere    s;
+        const auto r = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
+        const auto s = rtc::Sphere{};
 
         WHEN("xs <- intersect(s, r)")
         {
-            rtc::Intersect xs(&s, r);
+            const auto xs = rtc::Intersect(&s, r);
 
             THEN("xs.count = 2 and xs[0].t = 4.0 and xs[1].t = 6.0")
             {
@@ -94,12 +94,12 @@ SCENARIO("A ray intersects a sphere at a tangent", "[ray]")
 {
     GIVEN("r <- ray(point(0, 1, -5), vector(0, 0, 1)) and s <- sphere()")
     {
-        rtc::Ray       r(rtc::Point(0, 1, -5), rtc::Vector(0, 0, 1));
-        rtc::Sphere    s;
+        const auto r = rtc::Ray{ rtc::Point{ 0.0, 1.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
+        const auto s = rtc::Sphere{};
 
         WHEN("xs <- intersect(s, r)")
         {
-            rtc::Intersect xs(&s, r);
+            const auto xs = rtc::Intersect(&s, r);
 
             THEN("xs.count = 2 and xs[0].t = 5.0 and xs[1].t = 5.0")
             {
@@ -115,12 +115,12 @@ SCENARIO("A ray misses a sphere", "[ray]")
 {
     GIVEN("r <- ray(point(0, 2, -5), vector(0, 0, 1)) and s <- sphere()")
     {
-        rtc::Ray       r(rtc::Point(0, 2, -5), rtc::Vector(0, 0, 1));
-        rtc::Sphere    s;
+        const auto r = rtc::Ray{ rtc::Point{ 0.0, 2.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
+        const auto s = rtc::Sphere{};
 
         WHEN("xs <- intersect(s, r)")
         {
-            rtc::Intersect xs(&s, r);
+            const auto xs = rtc::Intersect(&s, r);
 
             THEN("xs.count = 0")
             {
@@ -134,12 +134,12 @@ SCENARIO("A ray originates inside a sphere", "[ray]")
 {
     GIVEN("r <- ray(point(0, 0, 0), vector(0, 0, 1)) and s <- sphere()")
     {
-        rtc::Ray       r(rtc::Point(0, 0, 0), rtc::Vector(0, 0, 1));
-        rtc::Sphere    s;
+        const auto r = rtc::Ray{ rtc::Point{ 0.0, 0.0, 0.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
+        const auto s = rtc::Sphere{};
 
         WHEN("xs <- intersect(s, r)")
         {
-            rtc::Intersect xs(&s, r);
+            const auto xs = rtc::Intersect(&s, r);
 
             THEN("xs.count = 2 and xs[0].t = -1.0 and xs[1].t = 1.0")
             {
@@ -155,12 +155,12 @@ SCENARIO("A sphere is behind a ray", "[ray]")
 {
     GIVEN("r <- ray(point(0, 0, 5), vector(0, 0, 1)) and s <- sphere()")
     {
-        rtc::Ray       r(rtc::Point(0, 0, 5), rtc::Vector(0, 0, 1));
-        rtc::Sphere    s;
+        const auto r = rtc::Ray{ rtc::Point{ 0.0, 0.0, 5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
+        const auto s = rtc::Sphere{};
 
         WHEN("xs <- intersect(s, r)")
         {
-            rtc::Intersect xs(&s, r);
+            const auto xs = rtc::Intersect(&s, r);
 
             THEN("xs.count = 2 and xs[0].t = -6.0 and xs[1].t = -4.0")
             {
@@ -176,11 +176,11 @@ SCENARIO("An intersection encapsulates t and object", "[ray]")
 {
     GIVEN("s <- sphere()")
     {
-        rtc::Sphere s;
+        const auto s = rtc::Sphere{};
 
         WHEN("i <- intersection(3.5, s)")
         {
-            rtc::Intersect::Intersection i{ 3.5, &s };
+            const auto i = rtc::Intersect::Intersection{ 3.5, &s };
 
             THEN("i.t = 3.5 and i.object = s")
             {
@@ -195,19 +195,19 @@ SCENARIO("Aggregating intersections", "[ray]")
 {
     GIVEN("s <- sphere() and i1 <- intersection(1, s) and i2 <- intersection(2, s)")
     {
-        rtc::Sphere                   s;
-        rtc::Intersect::Intersection  i1{ 1, &s };
-        rtc::Intersect::Intersection  i2{ 2, &s };
+        const auto s  = rtc::Sphere{};
+        const auto i1 = rtc::Intersect::Intersection{ 1.0, &s };
+        const auto i2 = rtc::Intersect::Intersection{ 2.0, &s };
 
         WHEN("xs <- intersections(i1, i2)")
         {
-            rtc::Intersect::Intersections xs{ i1, i2 };
+            const auto xs = rtc::Intersect::Intersections{ i1, i2 };
 
             THEN("xs.count = 2 and xs[0].t = 1 and xs[1].t = 2")
             {
                 REQUIRE(xs.size() == 2);
-                REQUIRE(rtc::Equal(xs[0].t, 1));
-                REQUIRE(rtc::Equal(xs[1].t, 2));
+                REQUIRE(rtc::Equal(xs[0].t, 1.0));
+                REQUIRE(rtc::Equal(xs[1].t, 2.0));
             }
         }
     }
@@ -217,12 +217,12 @@ SCENARIO("Intersect sets the object on the intersection", "[ray]")
 {
     GIVEN("r <- ray(point(0, 0, -5), vector(0, 0, 1)) and s <- sphere()")
     {
-        rtc::Ray       r(rtc::Point(0, 0, -5), rtc::Vector(0, 0, 1));
-        rtc::Sphere    s;
+        const auto r = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
+        const auto s = rtc::Sphere{};
 
         WHEN("xs <- intersect(s, r)")
         {
-            rtc::Intersect xs(&s, r);
+            const auto xs = rtc::Intersect(&s, r);
 
             THEN("xs.count = 2 and xs[0].object = s and xs[1].object = s")
             {
@@ -238,10 +238,10 @@ SCENARIO("The hit, when all intersections have positive t", "[ray]")
 {
     GIVEN("s <- sphere() and i1 <- intersection(1, s) and i2 <- intersection(2, s) and xs <- intersections(i2, i1)")
     {
-        rtc::Sphere                   s;
-        rtc::Intersect::Intersection  i1{ 1, &s };
-        rtc::Intersect::Intersection  i2{ 2, &s };
-        rtc::Intersect::Intersections xs{ i2, i1 };
+        const auto s  = rtc::Sphere{};
+        const auto i1 = rtc::Intersect::Intersection{ 1.0, &s };
+        const auto i2 = rtc::Intersect::Intersection{ 2.0, &s };
+        auto       xs = rtc::Intersect::Intersections{ i2, i1 };
 
         WHEN("i <- hit(xs)")
         {
@@ -262,10 +262,10 @@ SCENARIO("The hit, when some intersections have negative t", "[ray]")
 {
     GIVEN("s <- sphere() and i1 <- intersection(-1, s) and i2 <- intersection(1, s) and xs <- intersections(i2, i1)")
     {
-        rtc::Sphere                   s;
-        rtc::Intersect::Intersection  i1{ -1, &s };
-        rtc::Intersect::Intersection  i2{ 1, &s };
-        rtc::Intersect::Intersections xs{ i2, i1 };
+        const auto s  = rtc::Sphere{};
+        const auto i1 = rtc::Intersect::Intersection{ -1.0, &s };
+        const auto i2 = rtc::Intersect::Intersection{ 1.0, &s };
+        auto       xs = rtc::Intersect::Intersections{ i2, i1 };
 
         WHEN("i <- hit(xs)")
         {
@@ -285,10 +285,10 @@ SCENARIO("The hit, when all intersections have negative t", "[ray]")
 {
     GIVEN("s <- sphere() and i1 <- intersection(-2, s) and i2 <- intersection(-1, s) and xs <- intersections(i2, i1)")
     {
-        rtc::Sphere                   s;
-        rtc::Intersect::Intersection  i1{ -2, &s };
-        rtc::Intersect::Intersection  i2{ -1, &s };
-        rtc::Intersect::Intersections xs{ i2, i1 };
+        const auto s  = rtc::Sphere{};
+        const auto i1 = rtc::Intersect::Intersection{ -2.0, &s };
+        const auto i2 = rtc::Intersect::Intersection{ -1.0, &s };
+        auto       xs = rtc::Intersect::Intersections{ i2, i1 };
 
         WHEN("i <- hit(xs)")
         {
@@ -306,17 +306,17 @@ SCENARIO("Translating a ray", "[ray]")
 {
     GIVEN("r <- ray(point(1, 2, 3), vector(0, 1, 0)) and m <- translation(3, 4, 5)")
     {
-        rtc::Ray      r(rtc::Point(1, 2, 3), rtc::Vector(0, 1, 0));
-        rtc::Matrix44 m = rtc::Matrix44::Translation(3, 4, 5);
+        const auto r = rtc::Ray{ rtc::Point{ 1.0, 2.0, 3.0 }, rtc::Vector{ 0.0, 1.0, 0.0 } };
+        const auto m = rtc::Matrix44::Translation(3.0, 4.0, 5.0);
 
         WHEN("r2 <- transform(r, m)")
         {
-            rtc::Ray r2 = rtc::Matrix44::Transform(r, m);
+            const auto r2 = rtc::Matrix44::Transform(r, m);
 
             THEN("r2.origin = point(4, 6, 8) and r2.direcetion = vector(0, 1, 0)")
             {
-                REQUIRE(rtc::Point::Equal(r2.GetOrigin(), rtc::Point(4, 6, 8)));
-                REQUIRE(rtc::Vector::Equal(r2.GetDirection(), rtc::Vector(0, 1, 0)));
+                REQUIRE(rtc::Point::Equal(r2.GetOrigin(), rtc::Point{ 4.0, 6.0, 8.0 }));
+                REQUIRE(rtc::Vector::Equal(r2.GetDirection(), rtc::Vector{ 0.0, 1.0, 0.0 }));
             }
         }
     }
@@ -326,17 +326,17 @@ SCENARIO("Scaling a ray", "[ray]")
 {
     GIVEN("r <- ray(point(1, 2, 3), vector(0, 1, 0)) and m <- scaling(2, 3, 4)")
     {
-        rtc::Ray      r(rtc::Point(1, 2, 3), rtc::Vector(0, 1, 0));
-        rtc::Matrix44 m = rtc::Matrix44::Scaling(2, 3, 4);
+        const auto r = rtc::Ray{ rtc::Point{ 1.0, 2.0, 3.0 }, rtc::Vector{ 0.0, 1.0, 0.0 } };
+        const auto m = rtc::Matrix44::Scaling(2.0, 3.0, 4.0);
 
         WHEN("r2 <- transform(r, m)")
         {
-            rtc::Ray r2 = rtc::Matrix44::Transform(r, m);
+            const auto r2 = rtc::Matrix44::Transform(r, m);
 
             THEN("r2.origin = point(2, 6, 12) and r2.direcetion = vector(0, 3, 0)")
             {
-                REQUIRE(rtc::Point::Equal(r2.GetOrigin(), rtc::Point(2, 6, 12)));
-                REQUIRE(rtc::Vector::Equal(r2.GetDirection(), rtc::Vector(0, 3, 0)));
+                REQUIRE(rtc::Point::Equal(r2.GetOrigin(), rtc::Point{ 2.0, 6.0, 12.0 }));
+                REQUIRE(rtc::Vector::Equal(r2.GetDirection(), rtc::Vector{ 0.0, 3.0, 0.0 }));
             }
         }
     }
@@ -346,7 +346,7 @@ SCENARIO("A sphere's default transformation", "[ray]")
 {
     GIVEN("s <- sphere")
     {
-        rtc::Sphere s;
+        const auto s = rtc::Sphere{};
 
         THEN("s.transform = identity_matrix")
         {
@@ -359,8 +359,8 @@ SCENARIO("Changing a sphere's transformation", "[ray]")
 {
     GIVEN("s <- sphere and t <- translation(2, 3, 4)")
     {
-        rtc::Sphere   s;
-        rtc::Matrix44 t = rtc::Matrix44::Translation(2, 3, 4);
+        auto       s = rtc::Sphere{};
+        const auto t = rtc::Matrix44::Translation(2.0, 3.0, 4.0);
 
         WHEN("set_transform(s, t)")
         {
@@ -378,18 +378,18 @@ SCENARIO("Intersecting a scaled sphere with a ray", "[ray]")
 {
     GIVEN("r <- ray(point(0, 0, -5), vector(0, 0, 1)) and s <- sphere")
     {
-        rtc::Ray       r(rtc::Point(0, 0, -5), rtc::Vector(0, 0, 1));
+        const auto r = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
 
         WHEN("set_transform(s, scaling(2, 2, 2)) and xs <- intersect(s, r)")
         {
-            rtc::Sphere    s(rtc::Matrix44::Scaling(2, 2, 2));
-            rtc::Intersect xs(&s, r);
+            const auto s  = rtc::Sphere{ rtc::Matrix44::Scaling(2.0, 2.0, 2.0) };
+            const auto xs = rtc::Intersect(&s, r);
 
             THEN("xs.count = 2 and xs[0].t = 3 and xs[1].t = 7")
             {
                 REQUIRE(xs.GetCount() == 2);
-                REQUIRE(rtc::Equal(xs.GetValue(0).t, 3));
-                REQUIRE(rtc::Equal(xs.GetValue(1).t, 7));
+                REQUIRE(rtc::Equal(xs.GetValue(0).t, 3.0));
+                REQUIRE(rtc::Equal(xs.GetValue(1).t, 7.0));
             }
         }
     }
@@ -399,18 +399,17 @@ SCENARIO("Intersecting a translated sphere with a ray", "[ray]")
 {
     GIVEN("r <- ray(point(0, 0, -5), vector(0, 0, 1)) and s <- sphere")
     {
-        rtc::Ray       r(rtc::Point(0, 0, -5), rtc::Vector(0, 0, 1));
-        rtc::Sphere    s;
+        const auto r = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
+        auto       s = rtc::Sphere{};
 
         WHEN("set_transform(s, scaling(2, 2, 2)) and xs <- intersect(s, r)")
         {
-            s.SetTransform(rtc::Matrix44::Translation(5, 0, 0));
+            s.SetTransform(rtc::Matrix44::Translation(5.0, 0.0, 0.0));
 
-            rtc::Intersect xs(&s, r);
+            const auto xs = rtc::Intersect(&s, r);
 
             THEN("xs.count = 2 and xs[0].t = 3 and xs[1].t = 7")
             {
-
                 REQUIRE(xs.GetCount() == 0);
             }
         }

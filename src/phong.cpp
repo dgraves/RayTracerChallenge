@@ -29,22 +29,22 @@ namespace rtc
     Color Phong::Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eyev, const Vector& normalv)
     {
         // Combine the surface color with the light's color/intensity.
-        Color effective_color = Color::HadamardProduct(material.GetColor(), light.GetIntensity());
+        const auto effective_color = Color::HadamardProduct(material.GetColor(), light.GetIntensity());
 
         // Find the direction to the light source.
-        Vector lightv = Vector::Subtract(light.GetPosition(), point);
+        auto lightv = Vector{ Vector::Subtract(light.GetPosition(), point) };
         lightv.Normalize();
 
         // Compute the ambient contribution.
-        Color ambient = Color::Multiply(effective_color, material.GetAmbient());
+        const auto ambient = Color{ Color::Multiply(effective_color, material.GetAmbient()) };
 
         // The light_dot_normal value represents the cosine of the angle between the
         // light vector and the normal vector.  A negative number means the light is
         // on the other side of the surface.
-        double light_dot_normal = Vector::Dot(lightv, normalv);
+        const auto light_dot_normal = Vector::Dot(lightv, normalv);
 
-        Color diffuse;
-        Color specular;
+        auto diffuse  = Color{};
+        auto specular = Color{};
 
         if (light_dot_normal >= 0)
         {
@@ -54,13 +54,13 @@ namespace rtc
             // The reflect_dot_eye value represents the cosine of the angle between the
             // reflection vector and the eye vector.  A negative number means the light
             // reflects away from the eye.
-            Vector reflectv        = Vector::Reflect(Vector::Negate(lightv), normalv);
-            double reflect_dot_eye = Vector::Dot(reflectv, eyev);
+            const auto reflectv        = Vector::Reflect(Vector::Negate(lightv), normalv);
+            const auto reflect_dot_eye = Vector::Dot(reflectv, eyev);
 
             if (reflect_dot_eye > 0)
             {
                 // Compute the specular contribution.
-                double factor = pow(reflect_dot_eye, material.GetShininess());
+                const auto factor = pow(reflect_dot_eye, material.GetShininess());
 
                 specular = Vector::Multiply(light.GetIntensity(), (material.GetSpecular() * factor));
             }

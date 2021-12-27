@@ -105,22 +105,22 @@ namespace rtc
 
             if (Vector::Dot(normal, eye) < 0)
             {
-                return Computations(intersection.t, object, std::move(position), std::move(eye), Vector::Negate(normal), true);
+                return Computations{ intersection.t, object, std::move(position), std::move(eye), Vector::Negate(normal), true };
             }
             else
             {
-                return Computations(intersection.t, object, std::move(position), std::move(eye), std::move(normal), false);
+                return Computations{ intersection.t, object, std::move(position), std::move(eye), std::move(normal), false };
             }
         }
 
         static Color ColorAt(const World& world, const Ray& ray)
         {
-            auto intersect = Intersect(world, ray);
+            auto       intersect    = Intersect{ world, ray };
             const auto intersection = intersect.Hit();
 
             if (intersection != nullptr)
             {
-                auto comps = Computations::Prepare(*intersection, ray);
+                const auto comps = Computations::Prepare(*intersection, ray);
                 return comps.ShadeHit(world);
             }
 

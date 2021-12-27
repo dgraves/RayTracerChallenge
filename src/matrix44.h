@@ -28,6 +28,7 @@
 #include "tuple.h"
 #include "vector.h"
 
+#include <array>
 #include <cmath>
 #include <stdexcept>
 
@@ -50,7 +51,7 @@ namespace rtc
         {
         }
 
-        Matrix44(double data[4][4]) :
+        Matrix44(const double data[4][4]) :
             Matrix(data)
         {
         }
@@ -62,29 +63,29 @@ namespace rtc
 
         static Matrix44 Identity()
         {
-            return Matrix44({{
-                    {{ 1, 0, 0, 0 }},
-                    {{ 0, 1, 0, 0 }},
-                    {{ 0, 0, 1, 0 }},
-                    {{ 0, 0, 0, 1 }}
-                    }});
+            return Matrix44{ {{
+                    {{ 1.0, 0.0, 0.0, 0.0 }},
+                    {{ 0.0, 1.0, 0.0, 0.0 }},
+                    {{ 0.0, 0.0, 1.0, 0.0 }},
+                    {{ 0.0, 0.0, 0.0, 1.0 }}
+                    }} };
         }
 
         static Matrix44 Translation(double x, double y, double z)
         {
-            Matrix44 transform = Identity();
-            transform.Set(0, 3, x);
-            transform.Set(1, 3, y);
-            transform.Set(2, 3, z);
+            auto transform = Identity();
+            transform.Set(0u, 3u, x);
+            transform.Set(1u, 3u, y);
+            transform.Set(2u, 3u, z);
             return transform;
         }
 
         static Matrix44 Scaling(double x, double y, double z)
         {
-            Matrix44 transform = Identity();
-            transform.Set(0, 0, x);
-            transform.Set(1, 1, y);
-            transform.Set(2, 2, z);
+            auto transform = Identity();
+            transform.Set(0u, 0u, x);
+            transform.Set(1u, 1u, y);
+            transform.Set(2u, 2u, z);
             return transform;
         }
 
@@ -92,81 +93,81 @@ namespace rtc
         // viewed along that axis, toward the negative end. (Left-hand rule).
         static Matrix44 RotationX(double rad)
         {
-            Matrix44 transform = Identity();
-            double cos_r = cos(rad);
-            double sin_r = sin(rad);
-            transform.Set(1, 1, cos_r);
-            transform.Set(1, 2, -sin_r);
-            transform.Set(2, 1, sin_r);
-            transform.Set(2, 2, cos_r);
+            auto       transform = Identity();
+            const auto cos_r     = cos(rad);
+            const auto sin_r     = sin(rad);
+            transform.Set(1u, 1u, cos_r);
+            transform.Set(1u, 2u, -sin_r);
+            transform.Set(2u, 1u, sin_r);
+            transform.Set(2u, 2u, cos_r);
             return transform;
         }
 
         static Matrix44 RotationY(double rad)
         {
-            Matrix44 transform = Identity();
-            double cos_r = cos(rad);
-            double sin_r = sin(rad);
-            transform.Set(0, 0, cos_r);
-            transform.Set(0, 2, sin_r);
-            transform.Set(2, 0, -sin_r);
-            transform.Set(2, 2, cos_r);
+            auto       transform = Identity();
+            const auto cos_r     = cos(rad);
+            const auto sin_r     = sin(rad);
+            transform.Set(0u, 0u, cos_r);
+            transform.Set(0u, 2u, sin_r);
+            transform.Set(2u, 0u, -sin_r);
+            transform.Set(2u, 2u, cos_r);
             return transform;
         }
 
         static Matrix44 RotationZ(double rad)
         {
-            Matrix44 transform = Identity();
-            double cos_r = cos(rad);
-            double sin_r = sin(rad);
-            transform.Set(0, 0, cos_r);
-            transform.Set(0, 1, -sin_r);
-            transform.Set(1, 0, sin_r);
-            transform.Set(1, 1, cos_r);
+            auto       transform = Identity();
+            const auto cos_r     = cos(rad);
+            const auto sin_r     = sin(rad);
+            transform.Set(0u, 0u, cos_r);
+            transform.Set(0u, 1u, -sin_r);
+            transform.Set(1u, 0u, sin_r);
+            transform.Set(1u, 1u, cos_r);
             return transform;
         }
 
         static Matrix44 Shearing(double xy, double xz, double yx, double yz, double zx, double zy)
         {
-            Matrix44 transform = Identity();
-            transform.Set(0, 1, xy);
-            transform.Set(0, 2, xz);
-            transform.Set(1, 0, yx);
-            transform.Set(1, 2, yz);
-            transform.Set(2, 0, zx);
-            transform.Set(2, 1, zy);
+            auto transform = Identity();
+            transform.Set(0u, 1u, xy);
+            transform.Set(0u, 2u, xz);
+            transform.Set(1u, 0u, yx);
+            transform.Set(1u, 2u, yz);
+            transform.Set(2u, 0u, zx);
+            transform.Set(2u, 1u, zy);
             return transform;
         }
 
         static Matrix44 ViewTransform(const Point& from, const Point& to, const Vector& up)
         {
-            auto forward     = Vector::Normalize(rtc::Vector::Subtract(to, from));
-            auto up_norm     = Vector::Normalize(up);
-            auto left        = Vector::Cross(forward, up_norm);
-            auto true_up     = Vector::Cross(left, forward);
-            auto orientation = Matrix44({{
-                {{ left.GetX(), left.GetY(), left.GetZ(), 0 }},
-                {{ true_up.GetX(), true_up.GetY(), true_up.GetZ(), 0 }},
-                {{ -forward.GetX(), -forward.GetY(), -forward.GetZ(), 0 }},
-                {{ 0, 0, 0, 1}}
-                }});
+            const auto forward     = Vector::Normalize(rtc::Vector::Subtract(to, from));
+            const auto up_norm     = Vector::Normalize(up);
+            const auto left        = Vector::Cross(forward, up_norm);
+            const auto true_up     = Vector::Cross(left, forward);
+            const auto orientation = Matrix44{ {{
+                {{ left.GetX(), left.GetY(), left.GetZ(), 0.0 }},
+                {{ true_up.GetX(), true_up.GetY(), true_up.GetZ(), 0.0 }},
+                {{ -forward.GetX(), -forward.GetY(), -forward.GetZ(), 0.0 }},
+                {{ 0.0, 0.0, 0.0, 1.0 }}
+                }} };
 
             return rtc::Matrix44::Multiply(orientation, rtc::Matrix44::Translation(-from.GetX(), -from.GetY(), -from.GetZ()));
         }
 
         static Matrix44 Multiply(const Matrix44& lhs, const Matrix44& rhs)
         {
-            Matrix44 result;
+            auto result = Matrix44{};
 
-            for (uint32_t row = 0; row < 4; ++row)
+            for (uint32_t row = 0u; row < 4u; ++row)
             {
-                for (uint32_t column = 0; column < 4; ++column)
+                for (uint32_t column = 0u; column < 4u; ++column)
                 {
-                    double value =
-                        (lhs.Get(row, 0) * rhs.Get(0, column)) +
-                        (lhs.Get(row, 1) * rhs.Get(1, column)) +
-                        (lhs.Get(row, 2) * rhs.Get(2, column)) +
-                        (lhs.Get(row, 3) * rhs.Get(3, column));
+                    auto value =
+                        (lhs.Get(row, 0u) * rhs.Get(0u, column)) +
+                        (lhs.Get(row, 1u) * rhs.Get(1u, column)) +
+                        (lhs.Get(row, 2u) * rhs.Get(2u, column)) +
+                        (lhs.Get(row, 3u) * rhs.Get(3u, column));
                     result.Set(row, column, value);
                 }
             }
@@ -182,15 +183,15 @@ namespace rtc
 
         static Tuple Multiply(const Matrix44& lhs, const Tuple& rhs)
         {
-            double values[4];
+            auto values = std::array<double, 4>{};
 
-            for (uint32_t row = 0; row < 4; ++row)
+            for (uint32_t row = 0u; row < 4u; ++row)
             {
                 values[row] =
-                    (lhs.Get(row, 0) * rhs.GetX()) +
-                    (lhs.Get(row, 1) * rhs.GetY()) +
-                    (lhs.Get(row, 2) * rhs.GetZ()) +
-                    (lhs.Get(row, 3) * rhs.GetW());
+                    (lhs.Get(row, 0u) * rhs.GetX()) +
+                    (lhs.Get(row, 1u) * rhs.GetY()) +
+                    (lhs.Get(row, 2u) * rhs.GetZ()) +
+                    (lhs.Get(row, 3u) * rhs.GetW());
             }
 
             return Tuple(values[0], values[1], values[2], values[3]);
@@ -208,16 +209,16 @@ namespace rtc
 
         static Matrix44 Inverse(const Matrix44& matrix)
         {
-            double   determinant = matrix.Determinant();
-            Matrix44 inverse;
+            const auto determinant = matrix.Determinant();
+            auto       inverse     = Matrix44{};
 
             if (!rtc::Equal(determinant, 0.0))
             {
                 // Create a matrix consisting of the cofactors of each of the original elements,
                 // transposed and divided by the determinant of the original matrix.
-                for (uint32_t row = 0; row < 4; ++row)
+                for (uint32_t row = 0u; row < 4u; ++row)
                 {
-                    for (uint32_t column = 0; column < 4; ++column)
+                    for (uint32_t column = 0u; column < 4u; ++column)
                     {
                         inverse.Set(column, row, matrix.Cofactor(row, column) / determinant);
                     }

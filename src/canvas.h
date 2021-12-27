@@ -47,7 +47,7 @@ namespace rtc
         void Clear(const Color& color);
 
     private:
-        typedef std::vector<Color> PixelRow;
+        using PixelRow = std::vector<Color>;
 
     private:
         uint32_t              width_;

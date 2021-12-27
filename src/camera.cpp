@@ -32,34 +32,33 @@ namespace rtc
     Ray Camera::RayForPixel(uint32_t px, uint32_t py) const
     {
         // Compute the offset from the edge of the canvas to the pixel's center.
-        auto xoffset = (static_cast<double>(px) + 0.5) * pixel_size_;
-        auto yoffset = (static_cast<double>(py) + 0.5) * pixel_size_;
+        const auto xoffset = (static_cast<double>(px) + 0.5) * pixel_size_;
+        const auto yoffset = (static_cast<double>(py) + 0.5) * pixel_size_;
 
         // Compute the untransformed coordinates of the pixel in world space.
         // Note that the camera looks toward -z, so +x is to the *left*.
-        auto world_x = half_width_ - xoffset;
-        auto world_y = half_height_ - yoffset;
+        const auto world_x = half_width_ - xoffset;
+        const auto world_y = half_height_ - yoffset;
 
         // Using the camera matrix, transform the canvas point and the origin,
         // and then compute the ray's direction vector.
         // Note that the canvas is at z = -1.
-        auto pixel     = Matrix44::Multiply(inverse_transform_, Point(world_x, world_y, -1.0));
-        auto origin    = Matrix44::Multiply(inverse_transform_, Point(0.0, 0.0, 0.0));
-        auto direction = Vector::Normalize(Vector::Subtract(pixel, origin));
+        const auto pixel     = Matrix44::Multiply(inverse_transform_, Point{ world_x, world_y, -1.0 });
+        const auto origin    = Matrix44::Multiply(inverse_transform_, Point{ 0.0, 0.0, 0.0 });
+        const auto direction = Vector::Normalize(Vector::Subtract(pixel, origin));
 
-        return Ray(origin, direction);
+        return Ray{ origin, direction };
     }
 
     Canvas Camera::Render(const World& world) const
     {
-        auto image = Canvas(hsize_, vsize_);
+        auto image = Canvas{ hsize_, vsize_ };
 
         for (uint32_t y = 0u; y < vsize_; ++y)
         {
             for (uint32_t x = 0u; x < hsize_; ++x)
             {
-                auto ray   = RayForPixel(x, y);
-                auto color = Computations::ColorAt(world, ray);
+                auto color = Computations::ColorAt(world, RayForPixel(x, y));
                 image.WritePixel(x, y, std::move(color));
             }
         }
@@ -69,8 +68,8 @@ namespace rtc
 
     void Camera::ComputeSizes(uint32_t hsize, uint32_t vsize, double field_of_view)
     {
-        auto half_view = tan(field_of_view / 2.0);
-        auto aspect    = static_cast<double>(hsize) / static_cast<double>(vsize);
+        const auto half_view = tan(field_of_view / 2.0);
+        const auto aspect    = static_cast<double>(hsize) / static_cast<double>(vsize);
 
         if (aspect >= 1.0)
         {
