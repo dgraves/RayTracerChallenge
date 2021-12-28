@@ -286,7 +286,7 @@ SCENARIO("Lighting with the eye between the light and the surface", "[light and 
 
         WHEN("result <- lighting(m, light, position, eyev, normalv)")
         {
-            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv);
+            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv, false);
 
             THEN("result = color(1.9, 1.9, 1.9)")
             {
@@ -308,7 +308,7 @@ SCENARIO("Lighting with the eye between light and surface, eye offset 45 degrees
 
         WHEN("result <- lighting(m, light, position, eyev, normalv)")
         {
-            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv);
+            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv, false);
 
             THEN("result = color(1.0, 1.0, 1.0)")
             {
@@ -330,7 +330,7 @@ SCENARIO("Lighting with eye opposite surface, light offset 45 degrees", "[light 
 
         WHEN("result <- lighting(m, light, position, eyev, normalv)")
         {
-            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv);
+            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv, false);
 
             THEN("result = color(0.7364, 0.7364, 0.7364)")
             {
@@ -352,7 +352,7 @@ SCENARIO("Lighting with eye in the path of the reflection vector", "[light and s
 
         WHEN("result <- lighting(m, light, position, eyev, normalv)")
         {
-            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv);
+            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv, false);
 
             THEN("result = color(1.6364, 1.6364, 1.6364)")
             {
@@ -374,7 +374,7 @@ SCENARIO("Lighting with the light behind the surface", "[light and shading]")
 
         WHEN("result <- lighting(m, light, position, eyev, normalv)")
         {
-            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv);
+            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv, false);
 
             THEN("result = color(0.1, 0.1, 0.1)")
             {

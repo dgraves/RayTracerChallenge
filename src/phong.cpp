@@ -26,17 +26,22 @@
 
 namespace rtc
 {
-    Color Phong::Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eyev, const Vector& normalv)
+    Color Phong::Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eyev, const Vector& normalv, bool in_shadow)
     {
         // Combine the surface color with the light's color/intensity.
         const auto effective_color = Color::HadamardProduct(material.GetColor(), light.GetIntensity());
 
+        // Compute the ambient contribution.
+        auto ambient = Color{ Color::Multiply(effective_color, material.GetAmbient()) };
+
+        if (in_shadow)
+        {
+            return ambient;
+        }
+
         // Find the direction to the light source.
         auto lightv = Vector{ Vector::Subtract(light.GetPosition(), point) };
         lightv.Normalize();
-
-        // Compute the ambient contribution.
-        const auto ambient = Color{ Color::Multiply(effective_color, material.GetAmbient()) };
 
         // The light_dot_normal value represents the cosine of the angle between the
         // light vector and the normal vector.  A negative number means the light is

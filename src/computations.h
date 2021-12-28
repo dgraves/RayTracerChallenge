@@ -23,6 +23,7 @@
 #pragma once
 
 #include "color.h"
+#include "double_util.h"
 #include "intersect.h"
 #include "phong.h"
 #include "point.h"
@@ -38,10 +39,11 @@ namespace rtc
     class Computations
     {
     public:
-        Computations(double t, const Sphere* object, const Point& point, const Vector& eye, const Vector& normal, bool inside) :
+        Computations(double t, const Sphere* object, const Point& point, const Point& over_point, const Vector& eye, const Vector& normal, bool inside) :
             t_(t),
             object_(object),
             point_(point),
+            over_point_(over_point),
             eye_(eye),
             normal_(normal),
             inside_(inside)
@@ -49,10 +51,11 @@ namespace rtc
             assert(object_ != nullptr && "rtc::Computations was initialized with an invalid object");
         }
 
-        Computations(double t, const Sphere* object, Point&& point, Vector&& eye, Vector&& normal, bool inside) :
+        Computations(double t, const Sphere* object, Point&& point, Point&& over_point, Vector&& eye, Vector&& normal, bool inside) :
             t_(t),
             object_(object),
             point_(std::move(point)),
+            over_point_(std::move(over_point)),
             eye_(std::move(eye)),
             normal_(std::move(normal)),
             inside_(inside)
@@ -72,6 +75,8 @@ namespace rtc
 
         bool IsInside() const { return inside_; }
 
+        const Point& GetOverPoint() const { return over_point_; }
+
         Color ShadeHit(const World& world) const
         {
             assert(object_ != nullptr && "rtc::Computations was initialized with an invalid object");
@@ -80,12 +85,11 @@ namespace rtc
 
             if (object_ != nullptr)
             {
-                const auto& material = object_->GetMaterial();
-                const auto& lights   = world.GetLights();
+                const auto& lights = world.GetLights();
 
                 for (const auto& light : lights)
                 {
-                    color.Add(Phong::Lighting(material, light, point_, eye_, normal_));
+                    color.Add(Phong::Lighting(object_->GetMaterial(), light, over_point_, eye_, normal_, IsShadowed(world, light, over_point_)));
                 }
             }
 
@@ -105,11 +109,14 @@ namespace rtc
 
             if (Vector::Dot(normal, eye) < 0)
             {
-                return Computations{ intersection.t, object, std::move(position), std::move(eye), Vector::Negate(normal), true };
+                normal.Negate();
+                auto over_point = rtc::Point{ rtc::Point::Add(position, rtc::Vector::Multiply(normal, rtc::kEpsilon)) };
+                return Computations{ intersection.t, object, std::move(position), std::move(over_point), std::move(eye), std::move(normal), true };
             }
             else
             {
-                return Computations{ intersection.t, object, std::move(position), std::move(eye), std::move(normal), false };
+                auto over_point = rtc::Point{ rtc::Point::Add(position, rtc::Vector::Multiply(normal, rtc::kEpsilon)) };
+                return Computations{ intersection.t, object, std::move(position), std::move(over_point), std::move(eye), std::move(normal), false };
             }
         }
 
@@ -127,12 +134,31 @@ namespace rtc
             return Color{};
         };
 
+        static bool IsShadowed(const World& world, const PointLight& light, const Point& point)
+        {
+            auto       v        = rtc::Vector{ rtc::Vector::Subtract(light.GetPosition(), point) };
+            const auto distance = v.Magnitude();
+            v.Normalize(); // Direction
+
+            const auto r             = rtc::Ray{ point, v };
+            auto       intersections = rtc::Intersect(world, r);
+
+            const auto h = intersections.Hit();
+            if ((h != nullptr) && (h->t < distance))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
     private:
-        const double  t_;       ///< Value representing intersection 'time'.
-        const Sphere* object_;  ///< Pointer to intersected object.
-        const Point   point_;   ///< Position of intersection between ray and object.
-        const Vector  eye_;     ///< Eye vector computed from ray.
-        const Vector  normal_;  ///< Normal vector at ray intersection point with object.
-        const bool    inside_;  ///< Indicates that the intersection is inside the object.
+        const double  t_;          ///< Value representing intersection 'time'.
+        const Sphere* object_;     ///< Pointer to intersected object.
+        const Point   point_;      ///< Position of intersection between ray and object.
+        const Point   over_point_; ///< Same as point_ with the z component set to a value slightly less than zero.
+        const Vector  eye_;        ///< Eye vector computed from ray.
+        const Vector  normal_;     ///< Normal vector at ray intersection point with object.
+        const bool    inside_;     ///< Indicates that the intersection is inside the object.
     };
 }

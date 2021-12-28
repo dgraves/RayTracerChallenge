@@ -120,7 +120,7 @@ void RenderSphere(const std::string& filename)
                 const auto point  = r.GetPosition(hit->t);
                 const auto normal = object->NormalAt(point);
                 const auto eye    = rtc::Vector::Negate(r.GetDirection());
-                const auto color  = rtc::Phong::Lighting(object->GetMaterial(), light, point, eye, normal);
+                const auto color  = rtc::Phong::Lighting(object->GetMaterial(), light, point, eye, normal, false);
 
                 canvas.WritePixel(x, y, color);
             }

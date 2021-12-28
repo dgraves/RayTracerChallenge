@@ -54,7 +54,8 @@ add_executable(tests
     src/chapter4_test.cpp
     src/chapter5_test.cpp
     src/chapter6_test.cpp
-    src/chapter7_test.cpp)
+    src/chapter7_test.cpp
+    src/chapter8_test.cpp)
 target_link_libraries(tests PRIVATE rtc_lib Catch2::Catch2)
 
 include(CTest)
