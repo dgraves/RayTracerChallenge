@@ -20,42 +20,36 @@
 ** SOFTWARE.
 */
 
-#include "world.h"
+#include "intersections.h"
 
-#include "color.h"
-#include "material.h"
-#include "matrix44.h"
-#include "point.h"
+#include <algorithm>
 
 namespace rtc
 {
-    Intersections World::Intersect(const Ray& ray) const
+    void Intersections::Sort(Intersections::Values& values)
     {
-        Intersections::Values values{};
-
-        for (const auto& object : objects_)
-        {
-            object.Intersect(ray, values);
-        }
-
-        return Intersections{ std::move(values), true };
+        // Maintain original ordering of intersections with the same t value.
+        std::stable_sort(values.begin(), values.end(), [](const Intersections::Intersection& lhs, const Intersections::Intersection& rhs)
+            {
+                return (lhs.t < rhs.t);
+            });
     }
 
-    World World::GetDefault()
+    const Intersections::Intersection* Intersections::Hit(const Intersections::Values& values)
     {
-        return World{
+        const Intersections::Intersection* hit = nullptr;
+
+        // Find the first non-negative value.  Because hits are expected to be sorted by t,
+        // this is also the first hit.
+        for (const auto& value : values)
+        {
+            if (value.t >= 0)
             {
-                PointLight{ rtc::Point{ -10.0, 10.0, -10.0 }, rtc::Color{ 1.0, 1.0, 1.0} }
-            },
-            {
-                Sphere{
-                    rtc::Material{
-                        rtc::Color{ 0.8, 1.0, 0.6 },
-                        rtc::Material::GetDefaultAmbient(),
-                        0.7,
-                        0.2,
-                        rtc::Material::GetDefaultShininess() } },
-                Sphere{ rtc::Matrix44::Scaling(0.5, 0.5, 0.5) }
-            } };
+                hit = &value;
+                break;
+            }
+        }
+
+        return hit;
     }
 }

@@ -24,10 +24,10 @@
 
 #include "color.h"
 #include "double_util.h"
-#include "intersect.h"
+#include "intersections.h"
 #include "phong.h"
 #include "point.h"
-#include "sphere.h"
+#include "shape.h"
 #include "ray.h"
 #include "vector.h"
 #include "world.h"
@@ -39,7 +39,7 @@ namespace rtc
     class Computations
     {
     public:
-        Computations(double t, const Sphere* object, const Point& point, const Point& over_point, const Vector& eye, const Vector& normal, bool inside) :
+        Computations(double t, const Shape* object, const Point& point, const Point& over_point, const Vector& eye, const Vector& normal, bool inside) :
             t_(t),
             object_(object),
             point_(point),
@@ -51,7 +51,7 @@ namespace rtc
             assert(object_ != nullptr && "rtc::Computations was initialized with an invalid object");
         }
 
-        Computations(double t, const Sphere* object, Point&& point, Point&& over_point, Vector&& eye, Vector&& normal, bool inside) :
+        Computations(double t, const Shape* object, Point&& point, Point&& over_point, Vector&& eye, Vector&& normal, bool inside) :
             t_(t),
             object_(object),
             point_(std::move(point)),
@@ -65,7 +65,7 @@ namespace rtc
 
         double GetT() const { return t_; }
 
-        const Sphere* GetObject() const { return object_; }
+        const Shape* GetObject() const { return object_; }
 
         const Point& GetPoint() const { return point_; }
 
@@ -97,7 +97,7 @@ namespace rtc
         }
 
         // Instantiate a data strucutre for storing some precomputed values.
-        static Computations Prepare(const Intersect::Intersection& intersection, const Ray& ray)
+        static Computations Prepare(const Intersections::Intersection& intersection, const Ray& ray)
         {
             assert(intersection.object != nullptr && "rtc::Computations::Prepare was called with an invalid rtc::Intersect::Intersection object");
 
@@ -122,7 +122,7 @@ namespace rtc
 
         static Color ColorAt(const World& world, const Ray& ray)
         {
-            auto       intersect    = Intersect{ world, ray };
+            const auto intersect    = world.Intersect(ray);
             const auto intersection = intersect.Hit();
 
             if (intersection != nullptr)
@@ -141,7 +141,7 @@ namespace rtc
             v.Normalize(); // Direction
 
             const auto r             = rtc::Ray{ point, v };
-            auto       intersections = rtc::Intersect(world, r);
+            const auto intersections = world.Intersect(r);
 
             const auto h = intersections.Hit();
             if ((h != nullptr) && (h->t < distance))
@@ -154,7 +154,7 @@ namespace rtc
 
     private:
         const double  t_;          ///< Value representing intersection 'time'.
-        const Sphere* object_;     ///< Pointer to intersected object.
+        const Shape*  object_;     ///< Pointer to intersected object.
         const Point   point_;      ///< Position of intersection between ray and object.
         const Point   over_point_; ///< Same as point_ with the z component set to a value slightly less than zero.
         const Vector  eye_;        ///< Eye vector computed from ray.

@@ -23,62 +23,73 @@
 #pragma once
 
 #include "ray.h"
-#include "sphere.h"
-#include "world.h"
 
 #include <vector>
 
 namespace rtc
 {
-    class Intersect
+    class Shape;
+
+    class Intersections
     {
     public:
         struct Intersection
         {
             double        t{ 0.0 };           ///< Value representing intersection 'time'.
-            const Sphere* object{ nullptr };  ///< Pointer to intersected object.
+            const Shape* object{ nullptr };   ///< Pointer to intersected object.
         };
 
-        using Intersections = std::vector<Intersection>;
+        using Values = std::vector<Intersection>;
 
     public:
-        Intersect() : hit_(nullptr) { }
+        Intersections() { }
 
-        Intersect(const Sphere* sphere, const Ray& ray) : hit_(nullptr) { TestIntersect(sphere, ray); }
+        Intersections(const Values& values) :
+            values_(values)
+        {
+        }
 
-        Intersect(const World& world, const Ray& ray) : hit_(nullptr) { TestIntersect(world, ray); }
+        Intersections(Values&& values) :
+            values_(std::move(values))
+        {
+        }
+
+        Intersections(const Values& values, bool sort) :
+            values_(values)
+        {
+            if (sort)
+            {
+                Sort();
+            }
+        }
+
+        Intersections(Values&& values, bool sort) :
+            values_(std::move(values))
+        {
+            if (sort)
+            {
+                Sort();
+            }
+        }
+
+        bool IsEmpty() const { return values_.empty(); }
 
         size_t GetCount() const { return values_.size(); }
 
+        // TODO: Bounds checking.
         const Intersection& GetValue(size_t index) const { return values_[index]; }
 
-        void Test(const Sphere* sphere, const Ray& ray) { Reset(); TestIntersect(sphere, ray); }
+        const Values& GetValues() const { return values_; }
 
-        void Test(const World& world, const Ray& ray) { Reset(); TestIntersect(world, ray); }
+        void Sort() { Sort(values_); }
 
-        const Intersection* Hit()
-        {
-            if (hit_ == nullptr)
-            {
-                hit_ = Hit(values_);
-            }
+        const Intersection* Hit() const { return Hit(values_); }
 
-            return hit_;
-        }
+        static void Sort(Intersections::Values& intersections);
 
-        static void Sort(Intersections& intersections);
-
-        static const Intersection* Hit(const Intersections& intersections);
+        static const Intersection* Hit(const Intersections::Values& intersections);
 
     private:
-        void Reset() { hit_ = nullptr; values_.clear(); }
-
-        void TestIntersect(const Sphere* sphere, const Ray& ray);
-
-        void TestIntersect(const World& world, const Ray& ray);
-
-    private:
-        Intersections       values_;    ///< Values representing intersection 'times'.
-        const Intersection* hit_;       ///< Cached hit value, set by the first call to Hit().
+        Values values_;    ///< Values representing intersection 'times'.
     };
 }

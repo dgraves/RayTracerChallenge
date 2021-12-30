@@ -25,7 +25,7 @@
 #include "color.h"
 #include "computations.h"
 #include "double_util.h"
-#include "intersect.h"
+#include "intersections.h"
 #include "material.h"
 #include "matrix44.h"
 #include "phong.h"
@@ -134,7 +134,7 @@ SCENARIO("shade_hit() is given an intersection in shadow", "[shadows]")
             } };
         const auto& s2 = w.GetObject(1);
         const auto r   = rtc::Ray{ rtc::Point{ 0.0, 0.0, 5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
-        const auto i   = rtc::Intersect::Intersection{ 4.0, &s2 };
+        const auto i   = rtc::Intersections::Intersection{ 4.0, &s2 };
 
         WHEN("comps <- prepare_computations(i, r) and c <- shade_hit(w, comps)")
         {
@@ -158,7 +158,7 @@ SCENARIO("The hit should offset the point", "[shadows]")
     {
         const auto r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
         const auto shape = rtc::Sphere{ rtc::Matrix44::Translation(0.0, 0.0, 1.0) };
-        const auto i     = rtc::Intersect::Intersection{ 5.0, &shape };
+        const auto i     = rtc::Intersections::Intersection{ 5.0, &shape };
 
         WHEN("comps <- prepare_computations(i, r)")
         {

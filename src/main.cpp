@@ -24,7 +24,7 @@
 #include "canvas.h"
 #include "color.h"
 #include "double_util.h"
-#include "intersect.h"
+#include "intersections.h"
 #include "material.h"
 #include "phong.h"
 #include "point.h"
@@ -66,7 +66,7 @@ void RenderSphereSilhouette(const std::string& filename)
             const auto position = rtc::Point(world_x, world_y, wall_z);
 
             const auto r  = rtc::Ray{ ray_origin, rtc::Vector::Normalize(rtc::Point::Subtract(position, ray_origin)) };
-            auto       xs = rtc::Intersect{ &shape, r };
+            const auto xs = shape.Intersect(r);
 
             if (xs.Hit() != nullptr)
             {
@@ -111,7 +111,7 @@ void RenderSphere(const std::string& filename)
             const auto position = rtc::Point(world_x, world_y, wall_z);
 
             const auto r   = rtc::Ray(ray_origin, rtc::Vector::Normalize(rtc::Point::Subtract(position, ray_origin)));
-            auto       xs  = rtc::Intersect(&shape, r);
+            const auto xs  = shape.Intersect(r);
             const auto hit = xs.Hit();
 
             if (hit != nullptr)

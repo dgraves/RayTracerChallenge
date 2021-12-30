@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "color.h"
+#include "intersections.h"
 #include "point_light.h"
+#include "ray.h"
 #include "sphere.h"
 
-#include <functional>
 #include <vector>
 
 namespace rtc
@@ -76,6 +76,8 @@ namespace rtc
         void InsertObject(const Sphere& object) { objects_.push_back(object); }
 
         void InsertObject(Sphere&& object) { objects_.emplace_back(std::move(object)); }
+
+        Intersections Intersect(const Ray& ray) const;
 
         static World GetDefault();
 

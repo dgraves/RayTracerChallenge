@@ -20,8 +20,8 @@ add_library(rtc_lib STATIC
     src/double_util.h
     src/file_output_stream.h
     src/file_output_stream.cpp
-    src/intersect.h
-    src/intersect.cpp
+    src/intersections.h
+    src/intersections.cpp
     src/output_stream.h
     src/material.h
     src/matrix.h
@@ -35,7 +35,9 @@ add_library(rtc_lib STATIC
     src/point_light.h
     src/ppm_writer.h
     src/ppm_writer.cpp
+    src/shape.h
     src/sphere.h
+    src/sphere.cpp
     src/ray.h
     src/tuple.h
     src/vector.h
