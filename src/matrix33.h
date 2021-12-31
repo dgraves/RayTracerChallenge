@@ -29,9 +29,7 @@ namespace rtc
     class Matrix33 : public Matrix<3, 3>
     {
     public:
-        Matrix33()
-        {
-        }
+        Matrix33() = default;
 
         Matrix33(const Matrix& matrix) :
             Matrix(matrix)

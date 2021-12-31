@@ -22,27 +22,26 @@
 
 #pragma once
 
-#include <algorithm>
 #include <cinttypes>
 #include <cstdlib>
 
 namespace rtc
 {
-    const double kEpsilon = 0.00001;
+    constexpr double kEpsilon = 0.00001;
 
-    const double kPi = 3.141592653589793238462643383279502884;
+    constexpr double kPi = 3.141592653589793238462643383279502884;
 
-    static inline bool Equal(double l, double r) { return std::abs(l - r) < kEpsilon; }
+    inline bool Equal(double l, double r) { return std::abs(l - r) < kEpsilon; }
 
-    static inline double Square(double d) { return d * d; }
+    constexpr double Square(double d) { return d * d; }
 
-    static inline uint8_t ToByte(double d)
+    constexpr uint8_t ToByte(double d)
     {
         auto b = static_cast<int32_t>(255.0 * d);
         return static_cast<uint8_t>((b < 0) ? 0 : (b > 255) ? 255 : b);
     }
 
-    static inline double DegreesToRadians(double d) { return d * (kPi / 180.0); }
+    constexpr double DegreesToRadians(double d) { return d * (kPi / 180.0); }
 
-    static inline double RadiansToDegrees(double r) { return r * (180.0 / kPi); }
+    constexpr double RadiansToDegrees(double r) { return r * (180.0 / kPi); }
 }

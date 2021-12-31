@@ -42,7 +42,7 @@ namespace rtc
             ComputeSizes(hsize, vsize, field_of_view);
         }
 
-        Camera(double hsize, double vsize, double field_of_view, const Matrix44& transform) :
+        Camera(uint32_t hsize, uint32_t vsize, double field_of_view, const Matrix44& transform) :
             hsize_(hsize),
             vsize_(vsize),
             field_of_view_(field_of_view),
@@ -52,7 +52,7 @@ namespace rtc
             ComputeSizes(hsize, vsize, field_of_view);
         }
 
-        Camera(double hsize, double vsize, double field_of_view, Matrix44&& transform) :
+        Camera(uint32_t hsize, uint32_t vsize, double field_of_view, Matrix44&& transform) :
             hsize_(hsize),
             vsize_(vsize),
             field_of_view_(field_of_view),

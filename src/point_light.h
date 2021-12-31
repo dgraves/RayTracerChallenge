@@ -30,8 +30,6 @@ namespace rtc
     class PointLight
     {
     public:
-        PointLight() {}
-
         PointLight(const Point& position, const Color& intensity) :
             position_(position),
             intensity_(intensity)

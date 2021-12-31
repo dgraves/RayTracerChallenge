@@ -36,8 +36,6 @@ namespace rtc
         using Values = std::vector<Intersection>;
 
     public:
-        Intersections() { }
-
         Intersections(const Values& values) :
             values_(values)
         {

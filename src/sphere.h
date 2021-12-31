@@ -45,10 +45,7 @@ namespace rtc
 
     protected:
         // Default construct a unit sphere.
-        Sphere() :
-            Shape()
-        {
-        }
+        Sphere() = default;
 
         Sphere(const Material& material) :
             Shape(material)

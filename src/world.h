@@ -39,9 +39,7 @@ namespace rtc
         using Objects = std::vector<std::shared_ptr<Shape>>;
 
     public:
-        World()
-        {
-        }
+        World() = default;
 
         World(Lights&& lights, Objects&& objects) :
             lights_(std::move(lights)),

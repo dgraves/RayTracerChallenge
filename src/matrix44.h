@@ -37,9 +37,7 @@ namespace rtc
     class Matrix44 : public Matrix<4, 4>
     {
     public:
-        Matrix44()
-        {
-        }
+        Matrix44() = default;
 
         Matrix44(const Matrix& matrix) :
             Matrix(matrix)

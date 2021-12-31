@@ -29,9 +29,7 @@ namespace rtc
     class Matrix22 : public Matrix<2, 2>
     {
     public:
-        Matrix22()
-        {
-        }
+        Matrix22() = default;
 
         Matrix22(const Matrix& matrix) :
             Matrix(matrix)

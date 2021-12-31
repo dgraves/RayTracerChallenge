@@ -30,9 +30,8 @@
 
 namespace rtc
 {
-    class Phong
+    namespace Phong
     {
-    public:
-        static Color Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eye, const Vector& normal, bool in_shadow);
+        Color Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eye, const Vector& normal, bool in_shadow);
     };
 }

@@ -30,15 +30,14 @@
 
 namespace rtc
 {
-    class PpmWriter
+    namespace PpmWriter
     {
-    public:
-        static bool WriteFile(const std::string& filename, const Canvas& canvas);
+        bool WriteFile(const std::string& filename, const Canvas& canvas);
 
-        static bool WriteStream(OutputStream* stream, const Canvas& canvas);
+        bool WriteStream(OutputStream* stream, const Canvas& canvas);
 
-        static bool WriteHeader(OutputStream* stream, uint32_t width, uint32_t height);
+        bool WriteHeader(OutputStream* stream, uint32_t width, uint32_t height);
 
-        static bool WriteData(OutputStream* stream, const Canvas& canvas, uint32_t width, uint32_t height);
+        bool WriteData(OutputStream* stream, const Canvas& canvas, uint32_t width, uint32_t height);
     };
 }

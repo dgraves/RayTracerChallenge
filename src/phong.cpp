@@ -26,52 +26,55 @@
 
 namespace rtc
 {
-    Color Phong::Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eyev, const Vector& normalv, bool in_shadow)
+    namespace Phong
     {
-        // Combine the surface color with the light's color/intensity.
-        const auto effective_color = Color::HadamardProduct(material.GetColor(), light.GetIntensity());
-
-        // Compute the ambient contribution.
-        auto ambient = Color{ Color::Multiply(effective_color, material.GetAmbient()) };
-
-        if (in_shadow)
+        Color Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eyev, const Vector& normalv, bool in_shadow)
         {
-            return ambient;
-        }
+            // Combine the surface color with the light's color/intensity.
+            const auto effective_color = Color::HadamardProduct(material.GetColor(), light.GetIntensity());
 
-        // Find the direction to the light source.
-        auto lightv = Vector{ Vector::Subtract(light.GetPosition(), point) };
-        lightv.Normalize();
+            // Compute the ambient contribution.
+            auto ambient = Color{ Color::Multiply(effective_color, material.GetAmbient()) };
 
-        // The light_dot_normal value represents the cosine of the angle between the
-        // light vector and the normal vector.  A negative number means the light is
-        // on the other side of the surface.
-        const auto light_dot_normal = Vector::Dot(lightv, normalv);
-
-        auto diffuse  = Color{};
-        auto specular = Color{};
-
-        if (light_dot_normal >= 0)
-        {
-            // Compute the diffuse contribution.
-            diffuse = Color::Multiply(effective_color, (material.GetDiffuse() * light_dot_normal));
-
-            // The reflect_dot_eye value represents the cosine of the angle between the
-            // reflection vector and the eye vector.  A negative number means the light
-            // reflects away from the eye.
-            const auto reflectv        = Vector::Reflect(Vector::Negate(lightv), normalv);
-            const auto reflect_dot_eye = Vector::Dot(reflectv, eyev);
-
-            if (reflect_dot_eye > 0)
+            if (in_shadow)
             {
-                // Compute the specular contribution.
-                const auto factor = pow(reflect_dot_eye, material.GetShininess());
-
-                specular = Vector::Multiply(light.GetIntensity(), (material.GetSpecular() * factor));
+                return ambient;
             }
-        }
 
-        // Add the three contributions together to get the final shading.
-        return Color::Add(ambient, diffuse, specular);
+            // Find the direction to the light source.
+            auto lightv = Vector{ Vector::Subtract(light.GetPosition(), point) };
+            lightv.Normalize();
+
+            // The light_dot_normal value represents the cosine of the angle between the
+            // light vector and the normal vector.  A negative number means the light is
+            // on the other side of the surface.
+            const auto light_dot_normal = Vector::Dot(lightv, normalv);
+
+            auto diffuse  = Color{};
+            auto specular = Color{};
+
+            if (light_dot_normal >= 0)
+            {
+                // Compute the diffuse contribution.
+                diffuse = Color::Multiply(effective_color, (material.GetDiffuse() * light_dot_normal));
+
+                // The reflect_dot_eye value represents the cosine of the angle between the
+                // reflection vector and the eye vector.  A negative number means the light
+                // reflects away from the eye.
+                const auto reflectv        = Vector::Reflect(Vector::Negate(lightv), normalv);
+                const auto reflect_dot_eye = Vector::Dot(reflectv, eyev);
+
+                if (reflect_dot_eye > 0)
+                {
+                    // Compute the specular contribution.
+                    const auto factor = pow(reflect_dot_eye, material.GetShininess());
+
+                    specular = Vector::Multiply(light.GetIntensity(), (material.GetSpecular() * factor));
+                }
+            }
+
+            // Add the three contributions together to get the final shading.
+            return Color::Add(ambient, diffuse, specular);
+        }
     }
 }

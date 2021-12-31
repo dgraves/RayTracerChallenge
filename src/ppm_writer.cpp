@@ -30,127 +30,130 @@
 
 namespace rtc
 {
-    const auto kMaxLineLength = 70u;
-    const auto kMagicNumber   = std::string{ "P3\n" };
-    const auto kMaxColorValue = std::string{ "255\n" };
-
-    bool PpmWriter::WriteFile(const std::string& filename, const Canvas& canvas)
+    namespace PpmWriter
     {
-        auto stream = FileOutputStream{ filename };
+        constexpr auto kMaxLineLength = 70u;
+        const auto     kMagicNumber   = std::string{ "P3\n" };
+        const auto     kMaxColorValue = std::string{ "255\n" };
 
-        if (stream.IsValid())
+        bool WriteFile(const std::string& filename, const Canvas& canvas)
         {
-            return WriteStream(&stream, canvas);
-        }
+            auto stream = FileOutputStream{ filename };
 
-        return false;
-    }
-
-    bool PpmWriter::WriteStream(OutputStream* stream, const Canvas& canvas)
-    {
-        auto success = false;
-
-        if (stream != nullptr)
-        {
-            const auto width  = canvas.GetWidth();
-            const auto height = canvas.GetHeight();
-
-            success = WriteHeader(stream, width, height);
-            success = success && WriteData(stream, canvas, width, height);
-            success = success && stream->Write("\n", 1);
-        }
-
-        return success;
-    }
-
-    bool PpmWriter::WriteHeader(OutputStream* stream, uint32_t width, uint32_t height)
-    {
-        auto success = false;
-
-        if (stream != nullptr)
-        {
-            // Write "plain" PPM header.
-            auto dim = std::to_string(width);
-            dim += ' ';
-            dim += std::to_string(height);
-            dim += '\n';
-
-            success = stream->Write(kMagicNumber.c_str(), kMagicNumber.length());
-            success = success && stream->Write(dim.c_str(), dim.length());
-            success = success && stream->Write(kMaxColorValue.c_str(), kMaxColorValue.length());
-        }
-
-        return success;
-    }
-
-    bool PpmWriter::WriteData(OutputStream* stream, const Canvas& canvas, uint32_t width, uint32_t height)
-    {
-        auto success = false;
-
-        if (stream != nullptr)
-        {
-            auto   line  = std::string{};
-            size_t start = 0;
-
-            success = true;
-
-            for (uint32_t y = 0u; y < height; ++y)
+            if (stream.IsValid())
             {
-                for (uint32_t x = 0u; x < width; ++x)
+                return WriteStream(&stream, canvas);
+            }
+
+            return false;
+        }
+
+        bool WriteStream(OutputStream* stream, const Canvas& canvas)
+        {
+            auto success = false;
+
+            if (stream != nullptr)
+            {
+                const auto width  = canvas.GetWidth();
+                const auto height = canvas.GetHeight();
+
+                success = WriteHeader(stream, width, height);
+                success = success && WriteData(stream, canvas, width, height);
+                success = success && stream->Write("\n", 1);
+            }
+
+            return success;
+        }
+
+        bool WriteHeader(OutputStream* stream, uint32_t width, uint32_t height)
+        {
+            auto success = false;
+
+            if (stream != nullptr)
+            {
+                // Write "plain" PPM header.
+                auto dim = std::to_string(width);
+                dim += ' ';
+                dim += std::to_string(height);
+                dim += '\n';
+
+                success = stream->Write(kMagicNumber.c_str(), kMagicNumber.length());
+                success = success && stream->Write(dim.c_str(), dim.length());
+                success = success && stream->Write(kMaxColorValue.c_str(), kMaxColorValue.length());
+            }
+
+            return success;
+        }
+
+        bool WriteData(OutputStream* stream, const Canvas& canvas, uint32_t width, uint32_t height)
+        {
+            auto success = false;
+
+            if (stream != nullptr)
+            {
+                auto   line  = std::string{};
+                size_t start = 0;
+
+                success = true;
+
+                for (uint32_t y = 0u; y < height; ++y)
                 {
-                    const auto pixel = canvas.PixelAt(x, y);
-
-                    line += std::to_string(rtc::ToByte(pixel.GetR()));
-                    line += ' ';
-                    line += std::to_string(rtc::ToByte(pixel.GetG()));
-                    line += ' ';
-                    line += std::to_string(rtc::ToByte(pixel.GetB()));
-                    line += ' ';
-
-                    if ((line.length() - start) > kMaxLineLength)
+                    for (uint32_t x = 0u; x < width; ++x)
                     {
-                        // Find the index of the last space character closest to the line length limit.
-                        size_t last = start + kMaxLineLength - 1;
-                        while ((last > 0) && (line[last] != ' '))
+                        const auto pixel = canvas.PixelAt(x, y);
+
+                        line += std::to_string(rtc::ToByte(pixel.GetR()));
+                        line += ' ';
+                        line += std::to_string(rtc::ToByte(pixel.GetG()));
+                        line += ' ';
+                        line += std::to_string(rtc::ToByte(pixel.GetB()));
+                        line += ' ';
+
+                        if ((line.length() - start) > kMaxLineLength)
                         {
-                            --last;
+                            // Find the index of the last space character closest to the line length limit.
+                            size_t last = start + kMaxLineLength - 1;
+                            while ((last > 0) && (line[last] != ' '))
+                            {
+                                --last;
+                            }
+
+                            // Convert the space charactrer to a new line character.
+                            line[last] = '\n';
+
+                            // Convert from index to count.
+                            ++last;
+
+                            success = success && stream->Write(&line[start], (last - start));
+
+                            // New start position in string.
+                            start = last;
                         }
-
-                        // Convert the space charactrer to a new line character.
-                        line[last] = '\n';
-
-                        // Convert from index to count.
-                        ++last;
-
-                        success = success && stream->Write(&line[start], (last - start));
-
-                        // New start position in string.
-                        start = last;
                     }
-                }
 
-                auto length = line.length() - start;
-                if (length > 0)
-                {
-                    // Convert the space charactrer at the end of the line to a new line character.
-                    auto back = line.rbegin();
-                    (*back) = '\n';
+                    auto length = line.length() - start;
+                    if (length > 0)
+                    {
+                        // Convert the space charactrer at the end of the line to a new line character.
+                        auto back = line.rbegin();
+                        (*back) = '\n';
 
-                    success = success && stream->Write(&line[start], length);
-                    if (success)
-                    {
-                        line.clear();
-                        start = 0;
-                    }
-                    else
-                    {
-                        break;
+                        success = success && stream->Write(&line[start], length);
+                        if (success)
+                        {
+                            line.clear();
+                            start = 0;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        return success;
+            return success;
+        }
     }
 }
 

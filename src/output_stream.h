@@ -29,7 +29,7 @@ namespace rtc
     class OutputStream
     {
     public:
-        virtual ~OutputStream() { }
+        virtual ~OutputStream() = default;
 
         virtual bool IsValid() = 0;
 
