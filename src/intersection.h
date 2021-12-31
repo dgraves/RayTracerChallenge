@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020-2021 Dustin Graves
+** Copyright(c) 2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -20,36 +20,35 @@
 ** SOFTWARE.
 */
 
-#include "intersections.h"
+#pragma once
 
-#include <algorithm>
+#include <memory>
 
 namespace rtc
 {
-    void Intersections::Sort(Intersections::Values& values)
-    {
-        // Maintain original ordering of intersections with the same t value.
-        std::stable_sort(values.begin(), values.end(), [](const Intersection& lhs, const Intersection& rhs)
-            {
-                return (lhs.GetT() < rhs.GetT());
-            });
-    }
+    class Shape;
 
-    const Intersection* Intersections::Hit(const Intersections::Values& values)
+    class Intersection
     {
-        const Intersection* hit = nullptr;
-
-        // Find the first non-negative value.  Because hits are expected to be sorted by t,
-        // this is also the first hit.
-        for (const auto& value : values)
+    public:
+        Intersection(double t, const std::shared_ptr<const Shape>& object) :
+            t_(t),
+            object_(object)
         {
-            if (value.GetT() >= 0)
-            {
-                hit = &value;
-                break;
-            }
         }
 
-        return hit;
-    }
+        Intersection(double t, std::shared_ptr<const Shape>&& object) :
+            t_(t),
+            object_(std::move(object))
+        {
+        }
+
+        double GetT() const { return t_; }
+
+        const std::shared_ptr<const Shape> GetObject() const { return object_; }
+
+    private:
+        double                       t_;        ///< Value representing intersection 'time'.
+        std::shared_ptr<const Shape> object_;   ///< Pointer to intersected object.
+    };
 }

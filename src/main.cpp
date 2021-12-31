@@ -116,8 +116,8 @@ void RenderSphere(const std::string& filename)
 
             if (hit != nullptr)
             {
-                const auto object = hit->object;
-                const auto point  = r.GetPosition(hit->t);
+                const auto object = hit->GetObject();
+                const auto point  = r.GetPosition(hit->GetT());
                 const auto normal = object->NormalAt(point);
                 const auto eye    = rtc::Vector::Negate(r.GetDirection());
                 const auto color  = rtc::Phong::Lighting(object->GetMaterial(), light, point, eye, normal, false);

@@ -24,7 +24,7 @@
 
 #include "color.h"
 #include "double_util.h"
-#include "intersections.h"
+#include "intersection.h"
 #include "phong.h"
 #include "point.h"
 #include "shape.h"
@@ -49,7 +49,7 @@ namespace rtc
             normal_(normal),
             inside_(inside)
         {
-            assert(object_ != nullptr && "rtc::Computations was initialized with an invalid object");
+            assert(object_ && "rtc::Computations was initialized with an invalid object");
         }
 
         Computations(double t, std::shared_ptr<const Shape>&& object, Point&& point, Point&& over_point, Vector&& eye, Vector&& normal, bool inside) :
@@ -61,7 +61,7 @@ namespace rtc
             normal_(std::move(normal)),
             inside_(inside)
         {
-            assert(object_ != nullptr && "rtc::Computations was initialized with an invalid object");
+            assert(object_ && "rtc::Computations was initialized with an invalid object");
         }
 
         double GetT() const { return t_; }
@@ -80,7 +80,7 @@ namespace rtc
 
         Color ShadeHit(const World& world) const
         {
-            assert(object_ != nullptr && "rtc::Computations was initialized with an invalid object");
+            assert(object_ && "rtc::Computations was initialized with an invalid object");
 
             auto color = Color{};
 
@@ -98,13 +98,13 @@ namespace rtc
         }
 
         // Instantiate a data strucutre for storing some precomputed values.
-        static Computations Prepare(const Intersections::Intersection& intersection, const Ray& ray)
+        static Computations Prepare(const Intersection& intersection, const Ray& ray)
         {
-            assert(intersection.object != nullptr && "rtc::Computations::Prepare was called with an invalid rtc::Intersect::Intersection object");
+            assert(intersection.GetObject() && "rtc::Computations::Prepare was called with an invalid rtc::Intersect::Intersection object");
 
-            // TODO: Handle NULL object.
-            const auto object = intersection.object;
-            auto position     = ray.GetPosition(intersection.t);
+            const auto object = intersection.GetObject();
+            const auto t      = intersection.GetT();
+            auto position     = ray.GetPosition(t);
             auto eye          = Vector::Negate(ray.GetDirection());
             auto normal       = object->NormalAt(position);
 
@@ -112,12 +112,12 @@ namespace rtc
             {
                 normal.Negate();
                 auto over_point = rtc::Point{ rtc::Point::Add(position, rtc::Vector::Multiply(normal, rtc::kEpsilon)) };
-                return Computations{ intersection.t, object, std::move(position), std::move(over_point), std::move(eye), std::move(normal), true };
+                return Computations{ t, object, std::move(position), std::move(over_point), std::move(eye), std::move(normal), true };
             }
             else
             {
                 auto over_point = rtc::Point{ rtc::Point::Add(position, rtc::Vector::Multiply(normal, rtc::kEpsilon)) };
-                return Computations{ intersection.t, object, std::move(position), std::move(over_point), std::move(eye), std::move(normal), false };
+                return Computations{ t, object, std::move(position), std::move(over_point), std::move(eye), std::move(normal), false };
             }
         }
 
@@ -145,7 +145,7 @@ namespace rtc
             const auto intersections = world.Intersect(r);
 
             const auto h = intersections.Hit();
-            if ((h != nullptr) && (h->t < distance))
+            if ((h != nullptr) && (h->GetT() < distance))
             {
                 return true;
             }

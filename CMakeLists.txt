@@ -20,6 +20,7 @@ add_library(rtc_lib STATIC
     src/double_util.h
     src/file_output_stream.h
     src/file_output_stream.cpp
+    src/intersection.h
     src/intersections.h
     src/intersections.cpp
     src/output_stream.h

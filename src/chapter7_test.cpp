@@ -26,7 +26,7 @@
 #include "color.h"
 #include "computations.h"
 #include "double_util.h"
-#include "intersections.h"
+#include "intersection.h"
 #include "material.h"
 #include "matrix44.h"
 #include "point_light.h"
@@ -97,10 +97,10 @@ SCENARIO("Intersect a world with a ray", "[world]")
             THEN("xs.count = 4 and xs[0].t = 4 and xs[1].t = 4.5 and xs[2].t = 5.5 and xs[3].t = 6")
             {
                 REQUIRE(xs.GetCount() == 4);
-                REQUIRE(rtc::Equal(xs.GetValue(0).t, 4.0));
-                REQUIRE(rtc::Equal(xs.GetValue(1).t, 4.5));
-                REQUIRE(rtc::Equal(xs.GetValue(2).t, 5.5));
-                REQUIRE(rtc::Equal(xs.GetValue(3).t, 6.0));
+                REQUIRE(rtc::Equal(xs.GetValue(0).GetT(), 4.0));
+                REQUIRE(rtc::Equal(xs.GetValue(1).GetT(), 4.5));
+                REQUIRE(rtc::Equal(xs.GetValue(2).GetT(), 5.5));
+                REQUIRE(rtc::Equal(xs.GetValue(3).GetT(), 6.0));
             }
         }
     }
@@ -112,7 +112,7 @@ SCENARIO("Precomputing the state of an intersection", "[world]")
     {
         const auto r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
         auto       shape = rtc::Sphere::Create();
-        const auto i     = rtc::Intersections::Intersection{ 4.0, std::move(shape) };
+        const auto i     = rtc::Intersection{ 4.0, std::move(shape) };
 
         WHEN("comps <- prepare_computations(i, r)")
         {
@@ -120,8 +120,8 @@ SCENARIO("Precomputing the state of an intersection", "[world]")
 
             THEN("comps.t = i.t and comps.object = i.object and comps.point = point(0, 0, -1) and comps.eyev = vector(0, 0, -1) and comps.normalv = vector(0, 0, -1)")
             {
-                REQUIRE(rtc::Equal(comps.GetT(), i.t));
-                REQUIRE(comps.GetObject() == i.object);
+                REQUIRE(rtc::Equal(comps.GetT(), i.GetT()));
+                REQUIRE(comps.GetObject() == i.GetObject());
                 REQUIRE(rtc::Vector::Equal(comps.GetPoint(), rtc::Point{ 0.0, 0.0, -1.0 }));
                 REQUIRE(rtc::Vector::Equal(comps.GetEye(), rtc::Vector{ 0.0, 0.0, -1.0 }));
                 REQUIRE(rtc::Vector::Equal(comps.GetNormal(), rtc::Vector{ 0.0, 0.0, -1.0 }));
@@ -136,7 +136,7 @@ SCENARIO("The hit, when an intersection occurs on the outside", "[world]")
     {
         const auto r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
         auto       shape = rtc::Sphere::Create();
-        const auto i     = rtc::Intersections::Intersection{ 4.0, std::move(shape) };
+        const auto i     = rtc::Intersection{ 4.0, std::move(shape) };
 
         WHEN("comps <- prepare_computations(i, r)")
         {
@@ -156,7 +156,7 @@ SCENARIO("The hit, when an intersection occurs on the inside", "[world]")
     {
         const auto r     = rtc::Ray(rtc::Point(0.0, 0.0, 0.0), rtc::Vector(0.0, 0.0, 1.0));
         auto       shape = rtc::Sphere::Create();
-        const auto i     = rtc::Intersections::Intersection{ 1.0, std::move(shape) };
+        const auto i     = rtc::Intersection{ 1.0, std::move(shape) };
 
         WHEN("comps <- prepare_computations(i, r)")
         {
@@ -180,7 +180,7 @@ SCENARIO("Shading an intersection", "[world]")
         const auto  w     = rtc::World::GetDefault();
         const auto  r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
         const auto& shape = w.GetObject(0);
-        const auto  i     = rtc::Intersections::Intersection{ 4.0, shape };
+        const auto  i     = rtc::Intersection{ 4.0, shape };
 
         WHEN("comps <- prepare_computations(i, r) and c <- shade_hit(w, comps)")
         {
@@ -204,7 +204,7 @@ SCENARIO("Shading an intersection from the inside", "[world]")
 
         const auto  r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, 0.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
         const auto& shape = w.GetObject(1);
-        const auto  i     = rtc::Intersections::Intersection{ 0.5, shape };
+        const auto  i     = rtc::Intersection{ 0.5, shape };
 
         WHEN("comps <- prepare_computations(i, r) and c <- shade_hit(w, comps)")
         {

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "intersection.h"
 #include "ray.h"
 
 #include <memory>
@@ -29,17 +30,9 @@
 
 namespace rtc
 {
-    class Shape;
-
     class Intersections
     {
     public:
-        struct Intersection
-        {
-            double                       t{ 0.0 };    ///< Value representing intersection 'time'.
-            std::shared_ptr<const Shape> object{};    ///< Pointer to intersected object.
-        };
-
         using Values = std::vector<Intersection>;
 
     public:
