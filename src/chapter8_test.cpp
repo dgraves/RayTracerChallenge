@@ -32,6 +32,7 @@
 #include "point.h"
 #include "point_light.h"
 #include "ray.h"
+#include "sphere.h"
 #include "vector.h"
 #include "world.h"
 
@@ -129,12 +130,12 @@ SCENARIO("shade_hit() is given an intersection in shadow", "[shadows]")
         const auto w = rtc::World{
             { rtc::PointLight{ rtc::Point{ 0.0, 0.0, -10.0 }, rtc::Color{1.0, 1.0, 1.0} } },
             {
-                rtc::Sphere{},
-                rtc::Sphere{ rtc::Matrix44::Translation(0.0, 0.0, 10.0) }
+                rtc::Sphere::Create(),
+                rtc::Sphere::Create(rtc::Matrix44::Translation(0.0, 0.0, 10.0))
             } };
         const auto& s2 = w.GetObject(1);
         const auto r   = rtc::Ray{ rtc::Point{ 0.0, 0.0, 5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
-        const auto i   = rtc::Intersections::Intersection{ 4.0, &s2 };
+        const auto i   = rtc::Intersections::Intersection{ 4.0, s2 };
 
         WHEN("comps <- prepare_computations(i, r) and c <- shade_hit(w, comps)")
         {
@@ -157,8 +158,8 @@ SCENARIO("The hit should offset the point", "[shadows]")
           "i <- intersection(5, shape)")
     {
         const auto r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
-        const auto shape = rtc::Sphere{ rtc::Matrix44::Translation(0.0, 0.0, 1.0) };
-        const auto i     = rtc::Intersections::Intersection{ 5.0, &shape };
+        auto       shape = rtc::Sphere::Create(rtc::Matrix44::Translation(0.0, 0.0, 1.0));
+        const auto i     = rtc::Intersections::Intersection{ 5.0, std::move(shape) };
 
         WHEN("comps <- prepare_computations(i, r)")
         {

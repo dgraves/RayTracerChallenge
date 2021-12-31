@@ -33,13 +33,14 @@
 #include "world.h"
 
 #include <cassert>
+#include <memory>
 
 namespace rtc
 {
     class Computations
     {
     public:
-        Computations(double t, const Shape* object, const Point& point, const Point& over_point, const Vector& eye, const Vector& normal, bool inside) :
+        Computations(double t, const std::shared_ptr<const Shape> object, const Point& point, const Point& over_point, const Vector& eye, const Vector& normal, bool inside) :
             t_(t),
             object_(object),
             point_(point),
@@ -51,9 +52,9 @@ namespace rtc
             assert(object_ != nullptr && "rtc::Computations was initialized with an invalid object");
         }
 
-        Computations(double t, const Shape* object, Point&& point, Point&& over_point, Vector&& eye, Vector&& normal, bool inside) :
+        Computations(double t, std::shared_ptr<const Shape>&& object, Point&& point, Point&& over_point, Vector&& eye, Vector&& normal, bool inside) :
             t_(t),
-            object_(object),
+            object_(std::move(object)),
             point_(std::move(point)),
             over_point_(std::move(over_point)),
             eye_(std::move(eye)),
@@ -65,7 +66,7 @@ namespace rtc
 
         double GetT() const { return t_; }
 
-        const Shape* GetObject() const { return object_; }
+        const std::shared_ptr<const Shape>& GetObject() const { return object_; }
 
         const Point& GetPoint() const { return point_; }
 
@@ -153,12 +154,12 @@ namespace rtc
         }
 
     private:
-        const double  t_;          ///< Value representing intersection 'time'.
-        const Shape*  object_;     ///< Pointer to intersected object.
-        const Point   point_;      ///< Position of intersection between ray and object.
-        const Point   over_point_; ///< Same as point_ with the z component set to a value slightly less than zero.
-        const Vector  eye_;        ///< Eye vector computed from ray.
-        const Vector  normal_;     ///< Normal vector at ray intersection point with object.
-        const bool    inside_;     ///< Indicates that the intersection is inside the object.
+        const double                       t_;          ///< Value representing intersection 'time'.
+        const std::shared_ptr<const Shape> object_;     ///< Pointer to intersected object.
+        const Point                        point_;      ///< Position of intersection between ray and object.
+        const Point                        over_point_; ///< Same as point_ with the z component set to a value slightly less than zero.
+        const Vector                       eye_;        ///< Eye vector computed from ray.
+        const Vector                       normal_;     ///< Normal vector at ray intersection point with object.
+        const bool                         inside_;     ///< Indicates that the intersection is inside the object.
     };
 }

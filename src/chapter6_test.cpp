@@ -38,11 +38,11 @@ SCENARIO("The normal on a sphere at a point on the x axis", "[light and shading]
 {
     GIVEN("s <- sphere()")
     {
-        const auto s = rtc::Sphere{};
+        const auto s = rtc::Sphere::Create();
 
         WHEN("n <- normal_at(s, point(1, 0, 0)")
         {
-            const auto n = s.NormalAt(rtc::Point{ 1.0, 0.0, 0.0 });
+            const auto n = s->NormalAt(rtc::Point{ 1.0, 0.0, 0.0 });
 
             THEN("n = vector(1, 0, 0)")
             {
@@ -56,11 +56,11 @@ SCENARIO("The normal on a sphere at a point on the y axis", "[light and shading]
 {
     GIVEN("s <- sphere()")
     {
-        const auto s = rtc::Sphere{};
+        const auto s = rtc::Sphere::Create();
 
         WHEN("n <- normal_at(s, point(0.0, 1.0, 0.0)")
         {
-            rtc::Vector n = s.NormalAt(rtc::Point{ 0.0, 1.0, 0.0 });
+            rtc::Vector n = s->NormalAt(rtc::Point{ 0.0, 1.0, 0.0 });
 
             THEN("n = vector(0, 1, 0)")
             {
@@ -74,11 +74,11 @@ SCENARIO("The normal on a sphere at a point on the z axis", "[light and shading]
 {
     GIVEN("s <- sphere()")
     {
-        const auto s = rtc::Sphere{};
+        const auto s = rtc::Sphere::Create();
 
         WHEN("n <- normal_at(s, point(0, 0, 1)")
         {
-            rtc::Vector n = s.NormalAt(rtc::Point{ 0.0, 0.0, 1.0 });
+            rtc::Vector n = s->NormalAt(rtc::Point{ 0.0, 0.0, 1.0 });
 
             THEN("n = vector(0, 0, 1)")
             {
@@ -92,11 +92,11 @@ SCENARIO("The normal on a sphere at a non-axial point", "[light and shading]")
 {
     GIVEN("s <- sphere()")
     {
-        const auto s = rtc::Sphere{};
+        const auto s = rtc::Sphere::Create();
 
         WHEN("n <- normal_at(s, point(sqrt(3.0) / 3.0, sqrt(3.0) / 3.0, sqrt(3.0) / 3.0)")
         {
-            rtc::Vector n = s.NormalAt(rtc::Point{ sqrt(3.0) / 3.0, sqrt(3.0) / 3.0, sqrt(3.0) / 3.0 });
+            rtc::Vector n = s->NormalAt(rtc::Point{ sqrt(3.0) / 3.0, sqrt(3.0) / 3.0, sqrt(3.0) / 3.0 });
 
             THEN("n = vector(sqrt(3.0) / 3.0, sqrt(3.0) / 3.0, sqrt(3.0) / 3.0)")
             {
@@ -110,11 +110,11 @@ SCENARIO("The normal is a normalized vector", "[light and shading]")
 {
     GIVEN("s <- sphere()")
     {
-        const auto s = rtc::Sphere{};
+        const auto s = rtc::Sphere::Create();
 
         WHEN("n <- normal_at(s, point(sqrt(3.0) / 3.0, sqrt(3.0) / 3.0, sqrt(3.0) / 3.0)")
         {
-            rtc::Vector n = s.NormalAt(rtc::Point{ sqrt(3.0) / 3.0, sqrt(3.0) / 3.0, sqrt(3.0) / 3.0 });
+            rtc::Vector n = s->NormalAt(rtc::Point{ sqrt(3.0) / 3.0, sqrt(3.0) / 3.0, sqrt(3.0) / 3.0 });
 
             THEN("n = vector(sqrt(3.0) / 3.0, sqrt(3.0) / 3.0, sqrt(3.0) / 3.0)")
             {
@@ -128,11 +128,11 @@ SCENARIO("Computing the normal on a translated sphere", "[light and shading]")
 {
     GIVEN("s <- sphere() and set_transform(s, translation(0, 1, 0))")
     {
-        const auto s = rtc::Sphere(rtc::Matrix44::Translation(0, 1, 0));
+        const auto s = rtc::Sphere::Create(rtc::Matrix44::Translation(0, 1, 0));
 
         WHEN("n <- normal_at(s, point(0, 1.70711, -0.70711)")
         {
-            rtc::Vector n = s.NormalAt(rtc::Point{ 0.0, 1.70711, -0.70711 });
+            rtc::Vector n = s->NormalAt(rtc::Point{ 0.0, 1.70711, -0.70711 });
 
             THEN("n = vector(0, 0.70711, -0.70711)")
             {
@@ -146,11 +146,11 @@ SCENARIO("Computing the normal on a transformed sphere", "[light and shading]")
 {
     GIVEN("s <- sphere() and m <- scaling(1, 0.5, 1) * rotation_z(pi / 5.0) and set_transform(s, m)")
     {
-        const auto s = rtc::Sphere(rtc::Matrix44::Multiply(rtc::Matrix44::Scaling(1.0, 0.5, 1.0), rtc::Matrix44::RotationZ(rtc::kPi / 5.0)));
+        const auto s = rtc::Sphere::Create(rtc::Matrix44::Multiply(rtc::Matrix44::Scaling(1.0, 0.5, 1.0), rtc::Matrix44::RotationZ(rtc::kPi / 5.0)));
 
         WHEN("n <- normal_at(s, point(0, sqrt(2.0) / 2.0, -sqrt(2.0) / 2.0)")
         {
-            rtc::Vector n = s.NormalAt(rtc::Point{ 0.0, sqrt(2.0) / 2.0, -sqrt(2.0) / 2.0 });
+            rtc::Vector n = s->NormalAt(rtc::Point{ 0.0, sqrt(2.0) / 2.0, -sqrt(2.0) / 2.0 });
 
             THEN("n = vector(0, 0.97014, -0.24254)")
             {
@@ -239,11 +239,11 @@ SCENARIO("A sphere has a default material", "[light and shading]")
 {
     GIVEN("s <- sphere")
     {
-        const auto s = rtc::Sphere{};
+        const auto s = rtc::Sphere::Create();
 
         WHEN("m <- s.material")
         {
-            const auto m = s.GetMaterial();
+            const auto m = s->GetMaterial();
 
             THEN("m = material()")
             {
@@ -257,18 +257,18 @@ SCENARIO("A sphere may be assigned a material", "[light and shading]")
 {
     GIVEN("s <- sphere and m <- material and m.ambient <- 1")
     {
-        auto s = rtc::Sphere{};
+        auto s = rtc::Sphere::Create();
         auto m = rtc::Material{};
 
         m.SetAmbient(1);
 
         WHEN("s.material <- m")
         {
-            s.SetMaterial(m);
+            s->SetMaterial(m);
 
             THEN("s.material = m")
             {
-                REQUIRE(rtc::Material::Equal(s.GetMaterial(), m));
+                REQUIRE(rtc::Material::Equal(s->GetMaterial(), m));
             }
         }
     }

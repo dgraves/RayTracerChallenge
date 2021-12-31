@@ -24,6 +24,7 @@
 
 #include "ray.h"
 
+#include <memory>
 #include <vector>
 
 namespace rtc
@@ -35,8 +36,8 @@ namespace rtc
     public:
         struct Intersection
         {
-            double        t{ 0.0 };           ///< Value representing intersection 'time'.
-            const Shape* object{ nullptr };   ///< Pointer to intersected object.
+            double                       t{ 0.0 };    ///< Value representing intersection 'time'.
+            std::shared_ptr<const Shape> object{};    ///< Pointer to intersected object.
         };
 
         using Values = std::vector<Intersection>;
@@ -76,8 +77,7 @@ namespace rtc
 
         size_t GetCount() const { return values_.size(); }
 
-        // TODO: Bounds checking.
-        const Intersection& GetValue(size_t index) const { return values_[index]; }
+        const Intersection& GetValue(size_t index) const { return values_.at(index); }
 
         const Values& GetValues() const { return values_; }
 

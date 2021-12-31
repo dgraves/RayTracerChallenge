@@ -26,6 +26,9 @@
 #include "material.h"
 #include "matrix44.h"
 #include "point.h"
+#include "sphere.h"
+
+#include <cassert>
 
 namespace rtc
 {
@@ -35,7 +38,8 @@ namespace rtc
 
         for (const auto& object : objects_)
         {
-            object.Intersect(ray, values);
+            assert(object && "World::Intersect attempted to process an invalid object");
+            object->Intersect(ray, values);
         }
 
         return Intersections{ std::move(values), true };
@@ -48,14 +52,14 @@ namespace rtc
                 PointLight{ rtc::Point{ -10.0, 10.0, -10.0 }, rtc::Color{ 1.0, 1.0, 1.0} }
             },
             {
-                Sphere{
+                Sphere::Create(
                     rtc::Material{
                         rtc::Color{ 0.8, 1.0, 0.6 },
                         rtc::Material::GetDefaultAmbient(),
                         0.7,
                         0.2,
-                        rtc::Material::GetDefaultShininess() } },
-                Sphere{ rtc::Matrix44::Scaling(0.5, 0.5, 0.5) }
+                        rtc::Material::GetDefaultShininess() }),
+                Sphere::Create(rtc::Matrix44::Scaling(0.5, 0.5, 0.5))
             } };
     }
 }

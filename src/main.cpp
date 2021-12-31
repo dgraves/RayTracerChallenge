@@ -50,7 +50,7 @@ void RenderSphereSilhouette(const std::string& filename)
     auto       canvas     = rtc::Canvas{ canvas_pixels, canvas_pixels };
     const auto color      = rtc::Color{ 1.0, 0.0, 0.0 }; // Red
     const auto ray_origin = rtc::Point{ 0.0, 0.0, -5.0 };
-    const auto shape      = rtc::Sphere{};
+    const auto shape      = rtc::Sphere::Create();
 
     for (auto y = 0u; y < canvas_pixels; ++y)
     {
@@ -66,7 +66,7 @@ void RenderSphereSilhouette(const std::string& filename)
             const auto position = rtc::Point(world_x, world_y, wall_z);
 
             const auto r  = rtc::Ray{ ray_origin, rtc::Vector::Normalize(rtc::Point::Subtract(position, ray_origin)) };
-            const auto xs = shape.Intersect(r);
+            const auto xs = shape->Intersect(r);
 
             if (xs.Hit() != nullptr)
             {
@@ -90,12 +90,12 @@ void RenderSphere(const std::string& filename)
 
     auto       canvas     = rtc::Canvas{ canvas_pixels, canvas_pixels };
     const auto ray_origin = rtc::Point{ 0.0, 0.0, -5.0 };
-    auto       shape      = rtc::Sphere{};
+    auto       shape      = rtc::Sphere::Create();
     auto       material   = rtc::Material{};
     const auto light      = rtc::PointLight{ rtc::Point{ -10.0, 10.0, -10.0 }, rtc::Color{ 1.0, 1.0, 1.0 } };
 
     material.SetColor(rtc::Color{ 1.0, 0.2, 1.0 });
-    shape.SetMaterial(material);
+    shape->SetMaterial(material);
 
     for (auto y = 0u; y < canvas_pixels; ++y)
     {
@@ -111,7 +111,7 @@ void RenderSphere(const std::string& filename)
             const auto position = rtc::Point(world_x, world_y, wall_z);
 
             const auto r   = rtc::Ray(ray_origin, rtc::Vector::Normalize(rtc::Point::Subtract(position, ray_origin)));
-            const auto xs  = shape.Intersect(r);
+            const auto xs  = shape->Intersect(r);
             const auto hit = xs.Hit();
 
             if (hit != nullptr)
@@ -146,55 +146,55 @@ void RenderScene(const std::string& filename)
         },
         {
             // Parameters for the floor, constructed from an extremely flattened sphere with a matte texture.
-            rtc::Sphere{ rtc::Material{ floor_material }, rtc::Matrix44::Scaling(10.0, 0.01, 10.0) },
+            rtc::Sphere::Create(rtc::Material{ floor_material }, rtc::Matrix44::Scaling(10.0, 0.01, 10.0)),
 
             // Parameters for the left wall, with the same scale and color as the floor, but rotated and translated into place.
-            rtc::Sphere{
+            rtc::Sphere::Create(
                 rtc::Material{ floor_material },
                 rtc::Matrix44::Multiply(
                     rtc::Matrix44::Translation(0.0, 0.0, 5.0),
                     rtc::Matrix44::RotationY(-rtc::kPi / 4.0),
                     rtc::Matrix44::RotationX(rtc::kPi / 2.0),
-                    rtc::Matrix44::Scaling(10.0, 0.01, 10.0)) },
+                    rtc::Matrix44::Scaling(10.0, 0.01, 10.0))),
 
             // Parameters for the right wall, which is identical to the left, but rotated the opposite direction in y.
-            rtc::Sphere{
+            rtc::Sphere::Create(
                 rtc::Material{ floor_material },
                 rtc::Matrix44::Multiply(
                     rtc::Matrix44::Translation(0.0, 0.0, 5.0),
                     rtc::Matrix44::RotationY(rtc::kPi / 4.0),
                     rtc::Matrix44::RotationX(rtc::kPi / 2.0),
-                    rtc::Matrix44::Scaling(10.0, 0.01, 10.0)) },
+                    rtc::Matrix44::Scaling(10.0, 0.01, 10.0))),
 
             // Parameters for the large sphere in the middle, which is a unit sphere, translated upward slightly and colored green.
-            rtc::Sphere{
+            rtc::Sphere::Create(
                 rtc::Material{
                     rtc::Color{ 0.1, 1.0, 0.5 },
                     rtc::Material::GetDefaultAmbient(),
                     0.7,
                     0.3,
                     rtc::Material::GetDefaultShininess() },
-                rtc::Matrix44::Translation(-0.5, 1.0, 0.5) },
+                rtc::Matrix44::Translation(-0.5, 1.0, 0.5)),
 
             // Parameters for the smaller green sphere on the right, which is scaled by half.
-            rtc::Sphere{
+            rtc::Sphere::Create(
                 rtc::Material{
                     rtc::Color{ 0.5, 1.0, 0.1 },
                     rtc::Material::GetDefaultAmbient(),
                     0.7,
                     0.3,
                     rtc::Material::GetDefaultShininess() },
-                rtc::Matrix44::Multiply(rtc::Matrix44::Translation(1.5, 0.5, -0.5), rtc::Matrix44::Scaling(0.5, 0.5, 0.5)) },
+                rtc::Matrix44::Multiply(rtc::Matrix44::Translation(1.5, 0.5, -0.5), rtc::Matrix44::Scaling(0.5, 0.5, 0.5))),
 
             // Parameters for the smallest sphere, which is scaled by a third before being translated.
-            rtc::Sphere{
+            rtc::Sphere::Create(
                 rtc::Material{
                     rtc::Color{ 1.0, 0.8, 0.1 },
                     rtc::Material::GetDefaultAmbient(),
                     0.7,
                     0.3,
                     rtc::Material::GetDefaultShininess() },
-                rtc::Matrix44::Multiply(rtc::Matrix44::Translation(-1.5, 0.33, -0.75), rtc::Matrix44::Scaling(0.33, 0.33, 0.33)) }
+                rtc::Matrix44::Multiply(rtc::Matrix44::Translation(-1.5, 0.33, -0.75), rtc::Matrix44::Scaling(0.33, 0.33, 0.33)))
         } };
 
     // Construct the camera and render the world.

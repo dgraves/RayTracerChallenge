@@ -30,11 +30,20 @@
 #include "ray.h"
 #include "vector.h"
 
+#include <memory>
+
 namespace rtc
 {
     class Sphere : public Shape
     {
     public:
+        template <typename... Args>
+        static std::shared_ptr<Sphere> Create(Args... args)
+        {
+            return std::shared_ptr<Sphere>(new Sphere(args...));
+        }
+
+    protected:
         // Default construct a unit sphere.
         Sphere() :
             Shape()

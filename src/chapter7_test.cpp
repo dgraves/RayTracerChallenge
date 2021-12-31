@@ -59,13 +59,13 @@ SCENARIO("The default world", "[world]")
           "  | transform | scaling(0.5, 0.5, 0.5) |\n")
     {
         const auto light = rtc::PointLight{ rtc::Point{ -10.0, 10.0, -10.0 }, rtc::Color{ 1.0, 1.0, 1.0 } };
-        const auto s1    = rtc::Sphere{ rtc::Material{
+        const auto s1    = rtc::Sphere::Create(rtc::Material{
             rtc::Color{ 0.8, 1.0, 0.6 },
             rtc::Material::GetDefaultAmbient(),
             0.7,
             0.2,
-            rtc::Material::GetDefaultShininess() } };
-        const auto s2 = rtc::Sphere(rtc::Matrix44::Scaling(0.5, 0.5, 0.5));
+            rtc::Material::GetDefaultShininess() });
+        const auto s2 = rtc::Sphere::Create(rtc::Matrix44::Scaling(0.5, 0.5, 0.5));
 
         WHEN("w <- default_world()")
         {
@@ -74,8 +74,10 @@ SCENARIO("The default world", "[world]")
             THEN("w.light = light and w contains s1 and w contains s2")
             {
                 REQUIRE(rtc::PointLight::Equal(w.GetLight(0), light));
-                REQUIRE(rtc::Sphere::Equal(w.GetObject(0), s1));
-                REQUIRE(rtc::Sphere::Equal(w.GetObject(1), s2));
+                REQUIRE(rtc::Material::Equal(w.GetObject(0)->GetMaterial(), s1->GetMaterial()));
+                REQUIRE(rtc::Matrix44::Equal(w.GetObject(0)->GetTransform(), s1->GetTransform()));
+                REQUIRE(rtc::Material::Equal(w.GetObject(1)->GetMaterial(), s2->GetMaterial()));
+                REQUIRE(rtc::Matrix44::Equal(w.GetObject(1)->GetTransform(), s2->GetTransform()));
             }
         }
     }
@@ -109,8 +111,8 @@ SCENARIO("Precomputing the state of an intersection", "[world]")
     GIVEN("r <- ray(point(0, 0, -5), vector(0, 0, 1)) and shape <- sphere() and i <- intersection(4, shape)")
     {
         const auto r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
-        const auto shape = rtc::Sphere{};
-        const auto i     = rtc::Intersections::Intersection{ 4.0, &shape };
+        auto       shape = rtc::Sphere::Create();
+        const auto i     = rtc::Intersections::Intersection{ 4.0, std::move(shape) };
 
         WHEN("comps <- prepare_computations(i, r)")
         {
@@ -133,8 +135,8 @@ SCENARIO("The hit, when an intersection occurs on the outside", "[world]")
     GIVEN("r <- ray(point(0, 0, -5), vector(0, 0, 1)) and shape <- sphere() and i <- intersection(4, shape)")
     {
         const auto r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
-        const auto shape = rtc::Sphere{};
-        const auto i     = rtc::Intersections::Intersection{ 4.0, &shape };
+        auto       shape = rtc::Sphere::Create();
+        const auto i     = rtc::Intersections::Intersection{ 4.0, std::move(shape) };
 
         WHEN("comps <- prepare_computations(i, r)")
         {
@@ -153,8 +155,8 @@ SCENARIO("The hit, when an intersection occurs on the inside", "[world]")
     GIVEN("r <- ray(point(0, 0, 0), vector(0, 0, 1)) and shape <- sphere() and i <- intersection(1, shape)")
     {
         const auto r     = rtc::Ray(rtc::Point(0.0, 0.0, 0.0), rtc::Vector(0.0, 0.0, 1.0));
-        const auto shape = rtc::Sphere{};
-        const auto i     = rtc::Intersections::Intersection{ 1.0, &shape };
+        auto       shape = rtc::Sphere::Create();
+        const auto i     = rtc::Intersections::Intersection{ 1.0, std::move(shape) };
 
         WHEN("comps <- prepare_computations(i, r)")
         {
@@ -175,10 +177,10 @@ SCENARIO("Shading an intersection", "[world]")
 {
     GIVEN("w <- default_world() and r <- ray(point(0, 0, -5), vector(0, 0, 1)) and shape <- the first object in w and i <- intersection(4, shape)")
     {
-        const auto w     = rtc::World::GetDefault();
-        const auto r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
-        const auto shape = w.GetObject(0);
-        const auto i     = rtc::Intersections::Intersection{ 4.0, &shape };
+        const auto  w     = rtc::World::GetDefault();
+        const auto  r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, -5.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
+        const auto& shape = w.GetObject(0);
+        const auto  i     = rtc::Intersections::Intersection{ 4.0, shape };
 
         WHEN("comps <- prepare_computations(i, r) and c <- shade_hit(w, comps)")
         {
@@ -200,9 +202,9 @@ SCENARIO("Shading an intersection from the inside", "[world]")
         auto w = rtc::World::GetDefault();
         w.SetLight(0, rtc::PointLight{ rtc::Point{ 0.0, 0.25, 0.0 }, rtc::Color{ 1.0, 1.0, 1.0 } });
 
-        const auto r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, 0.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
-        const auto shape = w.GetObject(1);
-        const auto i     = rtc::Intersections::Intersection{ 0.5, &shape };
+        const auto  r     = rtc::Ray{ rtc::Point{ 0.0, 0.0, 0.0 }, rtc::Vector{ 0.0, 0.0, 1.0 } };
+        const auto& shape = w.GetObject(1);
+        const auto  i     = rtc::Intersections::Intersection{ 0.5, shape };
 
         WHEN("comps <- prepare_computations(i, r) and c <- shade_hit(w, comps)")
         {
@@ -263,14 +265,14 @@ SCENARIO("The color with an intersection behind the ray", "[world]")
         auto outer = w.GetObject(0);
         auto inner = w.GetObject(1);
 
-        auto outer_material = outer.GetMaterial();
+        auto outer_material = outer->GetMaterial();
         outer_material.SetAmbient(1);
-        outer.SetMaterial(outer_material);
+        outer->SetMaterial(outer_material);
         w.SetObject(0, outer);
 
-        auto inner_material = inner.GetMaterial();
+        auto inner_material = inner->GetMaterial();
         inner_material.SetAmbient(1);
-        inner.SetMaterial(inner_material);
+        inner->SetMaterial(inner_material);
         w.SetObject(1, inner);
 
         const auto r = rtc::Ray{ rtc::Point{ 0.0, 0.0, 0.75 }, rtc::Vector{ 0.0, 0.0, -1.0 } };

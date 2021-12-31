@@ -29,60 +29,13 @@
 #include "ray.h"
 #include "vector.h"
 
+#include <memory>
+
 namespace rtc
 {
-    class Shape
+    class Shape : public std::enable_shared_from_this<Shape>
     {
     public:
-        Shape() :
-            transform_(Matrix44::Identity()),
-            inverse_transform_(Matrix44::Identity()),
-            transposed_inverse_transform_(Matrix44::Identity())
-        {
-        }
-
-        Shape(const Material& material) :
-            material_(material),
-            transform_(Matrix44::Identity()),
-            inverse_transform_(Matrix44::Identity()),
-            transposed_inverse_transform_(Matrix44::Identity())
-        {
-        }
-
-        Shape(Material&& material) :
-            material_(std::move(material)),
-            transform_(Matrix44::Identity()),
-            inverse_transform_(Matrix44::Identity()),
-            transposed_inverse_transform_(Matrix44::Identity())
-        {
-        }
-
-        Shape(const Matrix44& transform) :
-            transform_(transform)
-        {
-            ComputeInverseTransforms();
-        }
-
-        Shape(Matrix44&& transform) :
-            transform_(std::move(transform))
-        {
-            ComputeInverseTransforms();
-        }
-
-        Shape(const Material& material, const Matrix44& transform) :
-            material_(material),
-            transform_(transform)
-        {
-            ComputeInverseTransforms();
-        }
-
-        Shape(Material&& material, Matrix44&& transform) :
-            material_(std::move(material)),
-            transform_(std::move(transform))
-        {
-            ComputeInverseTransforms();
-        }
-
         virtual ~Shape() = default;
 
         const Material& GetMaterial() const { return material_; }
@@ -136,10 +89,54 @@ namespace rtc
             return world_normal;
         }
 
-        static bool Equal(const Shape& lhs, const Shape& rhs)
+    protected:
+        Shape() :
+            transform_(Matrix44::Identity()),
+            inverse_transform_(Matrix44::Identity()),
+            transposed_inverse_transform_(Matrix44::Identity())
         {
-            return (Material::Equal(lhs.material_, rhs.material_) &&
-                    Matrix44::Equal(lhs.transform_, rhs.transform_));
+        }
+
+        Shape(const Material& material) :
+            material_(material),
+            transform_(Matrix44::Identity()),
+            inverse_transform_(Matrix44::Identity()),
+            transposed_inverse_transform_(Matrix44::Identity())
+        {
+        }
+
+        Shape(Material&& material) :
+            material_(std::move(material)),
+            transform_(Matrix44::Identity()),
+            inverse_transform_(Matrix44::Identity()),
+            transposed_inverse_transform_(Matrix44::Identity())
+        {
+        }
+
+        Shape(const Matrix44& transform) :
+            transform_(transform)
+        {
+            ComputeInverseTransforms();
+        }
+
+        Shape(Matrix44&& transform) :
+            transform_(std::move(transform))
+        {
+            ComputeInverseTransforms();
+        }
+
+        Shape(const Material& material, const Matrix44& transform) :
+            material_(material),
+            transform_(transform)
+        {
+            ComputeInverseTransforms();
+        }
+
+        Shape(Material&& material, Matrix44&& transform) :
+            material_(std::move(material)),
+            transform_(std::move(transform))
+        {
+            ComputeInverseTransforms();
         }
 
     private:

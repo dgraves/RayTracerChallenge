@@ -57,13 +57,13 @@ namespace rtc
         // Insert in sorted order.
         if (t1 < t2)
         {
-            values.emplace_back(t1, this);
-            values.emplace_back(t2, this);
+            values.emplace_back(t1, shared_from_this());
+            values.emplace_back(t2, shared_from_this());
         }
         else
         {
-            values.emplace_back(t2, this);
-            values.emplace_back(t1, this);
+            values.emplace_back(t2, shared_from_this());
+            values.emplace_back(t1, shared_from_this());
         }
     }
 }

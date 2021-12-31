@@ -25,8 +25,9 @@
 #include "intersections.h"
 #include "point_light.h"
 #include "ray.h"
-#include "sphere.h"
+#include "shape.h"
 
+#include <memory>
 #include <vector>
 
 namespace rtc
@@ -35,7 +36,7 @@ namespace rtc
     {
     public:
         using Lights  = std::vector<PointLight>;
-        using Objects = std::vector<Sphere>;
+        using Objects = std::vector<std::shared_ptr<Shape>>;
 
     public:
         World()
@@ -56,26 +57,25 @@ namespace rtc
 
         const Objects& GetObjects() const { return objects_; }
 
-        // TODO: Bounds checking for vectors.
-        const PointLight& GetLight(size_t index) const { return lights_[index]; }
+        const PointLight& GetLight(size_t index) const { return lights_.at(index); }
 
-        const Sphere& GetObject(size_t index) const { return objects_[index]; }
+        const std::shared_ptr<Shape>& GetObject(size_t index) const { return objects_.at(index); }
 
-        void SetLight(size_t index, const PointLight& light) { lights_[index] = light; }
+        void SetLight(size_t index, const PointLight& light) { lights_.at(index) = light; }
 
-        void SetLight(size_t index, PointLight&& light) { lights_[index] = std::move(light); }
+        void SetLight(size_t index, PointLight&& light) { lights_.at(index) = std::move(light); }
 
-        void SetObject(size_t index, const Sphere& object) { objects_[index] = object; }
+        void SetObject(size_t index, const std::shared_ptr<Shape>& object) { objects_.at(index) = object; }
 
-        void SetObject(size_t index, Sphere&& object) { objects_[index] = std::move(object); }
+        void SetObject(size_t index, std::shared_ptr<Shape>&& object) { objects_.at(index) = std::move(object); }
 
-        void InsertLight(const PointLight& light) { lights_.push_back(light); }
+        void AppendLight(const PointLight& light) { lights_.push_back(light); }
 
-        void InsertLight(PointLight&& light) { lights_.emplace_back(std::move(light)); }
+        void AppendLight(PointLight&& light) { lights_.emplace_back(std::move(light)); }
 
-        void InsertObject(const Sphere& object) { objects_.push_back(object); }
+        void AppendObject(const std::shared_ptr<Shape>& object) { objects_.push_back(object); }
 
-        void InsertObject(Sphere&& object) { objects_.emplace_back(std::move(object)); }
+        void AppendObject(std::shared_ptr<Shape>&& object) { objects_.emplace_back(std::move(object)); }
 
         Intersections Intersect(const Ray& ray) const;
 
