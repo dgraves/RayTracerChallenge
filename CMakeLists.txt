@@ -32,6 +32,8 @@ add_library(rtc_lib STATIC
     src/memory_output_stream.h
     src/phong.h
     src/phong.cpp
+    src/plane.h
+    src/plane.cpp
     src/point.h
     src/point_light.h
     src/ppm_writer.h
@@ -58,7 +60,8 @@ add_executable(tests
     src/chapter5_test.cpp
     src/chapter6_test.cpp
     src/chapter7_test.cpp
-    src/chapter8_test.cpp)
+    src/chapter8_test.cpp
+    src/chapter9_test.cpp)
 target_link_libraries(tests PRIVATE rtc_lib Catch2::Catch2)
 
 include(CTest)

@@ -27,6 +27,7 @@
 #include "intersections.h"
 #include "material.h"
 #include "phong.h"
+#include "plane.h"
 #include "point.h"
 #include "point_light.h"
 #include "ppm_writer.h"
@@ -207,6 +208,64 @@ void RenderScene(const std::string& filename)
     rtc::PpmWriter::WriteFile(filename, canvas);
 }
 
+// Render a scene with a plane, from Chapter 9 "Planes".
+void RenderPlaneScene(const std::string& filename)
+{
+    const auto world = rtc::World{
+        {
+            rtc::PointLight{ rtc::Point{ -10.0, 10.0, -10.0 }, rtc::Color{ 1.0, 1.0, 1.0 } }
+        },
+        {
+            // Parameters for the floor, constructed from a plane with a matte texture.
+            rtc::Plane::Create(
+                rtc::Material{
+                    rtc::Color{ 1.0, 0.9, 0.9 },
+                    rtc::Material::GetDefaultAmbient(),
+                    rtc::Material::GetDefaultDiffuse(),
+                    0.0,
+                    rtc::Material::GetDefaultShininess() }),
+
+            // Parameters for the large sphere in the middle, which is a unit sphere, translated upward slightly and colored green.
+            rtc::Sphere::Create(
+                rtc::Material{
+                    rtc::Color{ 0.1, 1.0, 0.5 },
+                    rtc::Material::GetDefaultAmbient(),
+                    0.7,
+                    0.3,
+                    rtc::Material::GetDefaultShininess() },
+                rtc::Matrix44::Translation(-0.5, 1.0, 0.5)),
+
+            // Parameters for the smaller green sphere on the right, which is scaled by half.
+            rtc::Sphere::Create(
+                rtc::Material{
+                    rtc::Color{ 0.5, 1.0, 0.1 },
+                    rtc::Material::GetDefaultAmbient(),
+                    0.7,
+                    0.3,
+                    rtc::Material::GetDefaultShininess() },
+                rtc::Matrix44::Multiply(rtc::Matrix44::Translation(1.5, 0.5, -0.5), rtc::Matrix44::Scaling(0.5, 0.5, 0.5))),
+
+                // Parameters for the smallest sphere, which is scaled by a third before being translated.
+                rtc::Sphere::Create(
+                    rtc::Material{
+                        rtc::Color{ 1.0, 0.8, 0.1 },
+                        rtc::Material::GetDefaultAmbient(),
+                        0.7,
+                        0.3,
+                        rtc::Material::GetDefaultShininess() },
+                    rtc::Matrix44::Multiply(rtc::Matrix44::Translation(-1.5, 0.33, -0.75), rtc::Matrix44::Scaling(0.33, 0.33, 0.33)))
+            } };
+
+    // Construct the camera and render the world.
+    const auto from = rtc::Point{ 0.0, 1.5, -5.0 };
+    const auto to = rtc::Point{ 0.0, 1.0, 0.0 };
+    const auto up = rtc::Vector{ 0.0, 1.0, 0.0 };
+    const auto camera = rtc::Camera{ 1000u, 500u, rtc::kPi / 3.0, rtc::Matrix44::ViewTransform(from, to, up) };
+    const auto canvas = camera.Render(world);
+
+    rtc::PpmWriter::WriteFile(filename, canvas);
+}
+
 int main()
 {
     RenderSphereSilhouette("silhouette.ppm");
@@ -214,6 +273,8 @@ int main()
     RenderSphere("sphere.ppm");
 
     RenderScene("scene.ppm");
+
+    RenderPlaneScene("plane.ppm");
 
     return 0;
 }
