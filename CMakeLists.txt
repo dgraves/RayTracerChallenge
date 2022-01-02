@@ -10,6 +10,12 @@ list(APPEND CMAKE_PREFIX_PATH "external/Catch2")
 
 find_package(Catch2 REQUIRED)
 
+if(MSVC)
+  add_compile_options(/W4)
+else()
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
 add_library(rtc_lib STATIC
     src/camera.h
     src/camera.cpp
