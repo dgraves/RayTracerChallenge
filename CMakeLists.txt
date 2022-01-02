@@ -15,11 +15,13 @@ add_library(rtc_lib STATIC
     src/camera.cpp
     src/canvas.h
     src/canvas.cpp
+    src/checkers_pattern.h
     src/color.h
     src/computations.h
     src/double_util.h
     src/file_output_stream.h
     src/file_output_stream.cpp
+    src/gradient_pattern.h
     src/intersection.h
     src/intersections.h
     src/intersections.cpp
@@ -30,6 +32,7 @@ add_library(rtc_lib STATIC
     src/matrix33.h
     src/matrix44.h
     src/memory_output_stream.h
+    src/pattern.h
     src/phong.h
     src/phong.cpp
     src/plane.h
@@ -38,10 +41,12 @@ add_library(rtc_lib STATIC
     src/point_light.h
     src/ppm_writer.h
     src/ppm_writer.cpp
+    src/ray.h
+    src/ring_pattern.h
     src/shape.h
     src/sphere.h
     src/sphere.cpp
-    src/ray.h
+    src/stripe_pattern.h
     src/tuple.h
     src/vector.h
     src/world.h
@@ -61,7 +66,8 @@ add_executable(tests
     src/chapter6_test.cpp
     src/chapter7_test.cpp
     src/chapter8_test.cpp
-    src/chapter9_test.cpp)
+    src/chapter9_test.cpp
+    src/chapter10_test.cpp)
 target_link_libraries(tests PRIVATE rtc_lib Catch2::Catch2)
 
 include(CTest)

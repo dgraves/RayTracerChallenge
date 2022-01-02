@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -24,6 +24,7 @@
 
 #include "color.h"
 #include "material.h"
+#include "matrix44.h"
 #include "point.h"
 #include "point_light.h"
 #include "vector.h"
@@ -32,6 +33,6 @@ namespace rtc
 {
     namespace Phong
     {
-        Color Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eye, const Vector& normal, bool in_shadow);
+        Color Lighting(const Material& material, const Matrix44& object_inverse_transform, const PointLight& light, const Point& point, const Vector& eye, const Vector& normal, bool in_shadow);
     };
 }

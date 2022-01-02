@@ -49,7 +49,7 @@ SCENARIO("Lighting with the surface in shadow", "[shadows]")
 
         WHEN("result <- lighting(m, light, position, eyev, normalv)")
         {
-            const auto result = rtc::Phong::Lighting(m, light, position, eyev, normalv, in_shadow);
+            const auto result = rtc::Phong::Lighting(m, rtc::Matrix44::Identity(), light, position, eyev, normalv, in_shadow);
 
             THEN("result = color(0.1, 0.1, 0.1)")
             {

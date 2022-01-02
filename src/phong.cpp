@@ -1,5 +1,5 @@
 /*
-** Copyright(c) 2020 Dustin Graves
+** Copyright(c) 2020-2021 Dustin Graves
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this softwareand associated documentation files(the "Software"), to deal
@@ -22,16 +22,19 @@
 
 #include "phong.h"
 
+#include "pattern.h"
+
 #include <cmath>
 
 namespace rtc
 {
     namespace Phong
     {
-        Color Lighting(const Material& material, const PointLight& light, const Point& point, const Vector& eyev, const Vector& normalv, bool in_shadow)
+        Color Lighting(const Material& material, const Matrix44& object_inverse_transform, const PointLight& light, const Point& point, const Vector& eyev, const Vector& normalv, bool in_shadow)
         {
             // Combine the surface color with the light's color/intensity.
-            const auto effective_color = Color::HadamardProduct(material.GetColor(), light.GetIntensity());
+            const auto& pattern         = material.GetPattern();
+            const auto  effective_color = Color::HadamardProduct(pattern ? pattern->PatternAtObject(object_inverse_transform, point) : material.GetColor(), light.GetIntensity());
 
             // Compute the ambient contribution.
             auto ambient = Color{ Color::Multiply(effective_color, material.GetAmbient()) };

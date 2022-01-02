@@ -22,8 +22,10 @@
 
 #include "camera.h"
 #include "canvas.h"
+#include "checkers_pattern.h"
 #include "color.h"
 #include "double_util.h"
+#include "gradient_pattern.h"
 #include "intersections.h"
 #include "material.h"
 #include "phong.h"
@@ -32,10 +34,15 @@
 #include "point_light.h"
 #include "ppm_writer.h"
 #include "ray.h"
+#include "ring_pattern.h"
 #include "sphere.h"
+#include "stripe_pattern.h"
 #include "vector.h"
 #include "world.h"
 
+#include <chrono>
+#include <cstdio>
+#include <future>
 #include <string>
 
 // Render the silhouette of a sphere (a circle), from Chapter 5 "Putting it together".
@@ -121,7 +128,7 @@ void RenderSphere(const std::string& filename)
                 const auto point  = r.GetPosition(hit->GetT());
                 const auto normal = object->NormalAt(point);
                 const auto eye    = rtc::Vector::Negate(r.GetDirection());
-                const auto color  = rtc::Phong::Lighting(object->GetMaterial(), light, point, eye, normal, false);
+                const auto color  = rtc::Phong::Lighting(object->GetMaterial(), rtc::Matrix44::Identity(), light, point, eye, normal, false);
 
                 canvas.WritePixel(x, y, color);
             }
@@ -266,15 +273,108 @@ void RenderPlaneScene(const std::string& filename)
     rtc::PpmWriter::WriteFile(filename, canvas);
 }
 
-int main()
+// Render a scene with a pattern, from Chapter 10 "Patterns".
+void RenderPatternScene(const std::string& filename)
+{
+    const auto world = rtc::World{
+        {
+            rtc::PointLight{ rtc::Point{ -10.0, 10.0, -10.0 }, rtc::Color{ 1.0, 1.0, 1.0 } },
+            rtc::PointLight{ rtc::Point{ 10.0, 10.0, -10.0 }, rtc::Color{ 0.0, 0.0, 1.0 } }
+        },
+        {
+            // Parameters for the floor, constructed from a plane with a matte texture.
+            rtc::Plane::Create(
+                rtc::Material{
+                    rtc::CheckersPattern::Create(rtc::Color{ 0.8, 0.8, 0.8 }, rtc::Color{ 0.2, 0.2, 0.2 }),
+                    rtc::Material::GetDefaultAmbient(),
+                    rtc::Material::GetDefaultDiffuse(),
+                    0.0,
+                    rtc::Material::GetDefaultShininess() }),
+
+            // Parameters for the wall, constructed from a plane with a matte texture.
+            rtc::Plane::Create(
+                rtc::Material{
+                    rtc::RingPattern::Create(rtc::Color{ 0.7, 0.7, 0.7 }, rtc::Color{ 0.1, 0.1, 0.1 }, rtc::Matrix44::Scaling(0.2, 0.2, 0.2)),
+                    rtc::Material::GetDefaultAmbient(),
+                    rtc::Material::GetDefaultDiffuse(),
+                    0.0,
+                    rtc::Material::GetDefaultShininess() },
+                    rtc::Matrix44::Multiply(rtc::Matrix44::Translation(0.0, 0.0, 5.0), rtc::Matrix44::RotationX(rtc::DegreesToRadians(90.0)))),
+
+            // Parameters for the large sphere in the middle, which is a unit sphere, translated upward slightly and colored green.
+            rtc::Sphere::Create(
+                rtc::Material{
+                    rtc::StripePattern::Create(rtc::Color{ 0.8, 0.8, 0.0 }, rtc::Color{ 0.0, 0.8, 0.0 }, rtc::Matrix44::Multiply(rtc::Matrix44::RotationZ(rtc::DegreesToRadians(90.0)), rtc::Matrix44::Scaling(0.3, 0.3, 0.3))),
+                    rtc::Material::GetDefaultAmbient(),
+                    0.7,
+                    0.3,
+                    rtc::Material::GetDefaultShininess() },
+                rtc::Matrix44::Translation(-0.5, 1.0, 0.5)),
+
+                // Parameters for the smaller green sphere on the right, which is scaled by half.
+                rtc::Sphere::Create(
+                    rtc::Material{
+                        rtc::GradientPattern::Create(rtc::Color{ 0.8, 0.0, 0.0 }, rtc::Color{ 0.0, 0.0, 0.5 }, rtc::Matrix44::RotationY(rtc::DegreesToRadians(-45.0))),
+                        rtc::Material::GetDefaultAmbient(),
+                        0.7,
+                        0.3,
+                        rtc::Material::GetDefaultShininess() },
+                    rtc::Matrix44::Multiply(rtc::Matrix44::Translation(1.5, 0.5, -0.5), rtc::Matrix44::Scaling(0.5, 0.5, 0.5))),
+
+                // Parameters for the smallest sphere, which is scaled by a third before being translated.
+                rtc::Sphere::Create(
+                    rtc::Material{
+                    rtc::CheckersPattern::Create(rtc::Color{ 0.0, 0.8, 0.8 }, rtc::Color{ 1.0, 1.0, 1.0 }, rtc::Matrix44::Scaling(0.3, 0.3, 0.3)),
+                        rtc::Material::GetDefaultAmbient(),
+                        0.7,
+                        0.3,
+                        rtc::Material::GetDefaultShininess() },
+                    rtc::Matrix44::Multiply(rtc::Matrix44::Translation(-1.5, 0.33, -0.75), rtc::Matrix44::Scaling(0.33, 0.33, 0.33)))
+            } };
+
+    // Construct the camera and render the world.
+    const auto from = rtc::Point{ -1.5, 1.5, -5.0 };
+    const auto to = rtc::Point{ 0.0, 1.0, 0.0 };
+    const auto up = rtc::Vector{ 0.0, 1.0, 0.0 };
+    const auto camera = rtc::Camera{ 1000u, 500u, rtc::kPi / 3.0, rtc::Matrix44::ViewTransform(from, to, up) };
+    const auto canvas = camera.Render(world);
+
+    rtc::PpmWriter::WriteFile(filename, canvas);
+}
+
+void RenderAsync(std::launch policy)
+{
+    auto render1 = std::async(policy, RenderSphereSilhouette, "silhouette.ppm");
+    auto render2 = std::async(policy, RenderSphere, "sphere.ppm");
+    auto render3 = std::async(policy, RenderScene, "scene.ppm");
+    auto render4 = std::async(policy, RenderPlaneScene, "plane.ppm");
+    auto render5 = std::async(policy, RenderPatternScene, "pattern.ppm");
+
+    render1.wait();
+    render2.wait();
+    render3.wait();
+    render4.wait();
+    render5.wait();
+}
+
+void Render()
 {
     RenderSphereSilhouette("silhouette.ppm");
-
     RenderSphere("sphere.ppm");
-
     RenderScene("scene.ppm");
-
     RenderPlaneScene("plane.ppm");
+    RenderPatternScene("pattern.ppm");
+}
+
+int main()
+{
+    const auto start = std::chrono::steady_clock::now();
+
+    RenderAsync(std::launch::async);
+
+    const auto stop = std::chrono::steady_clock::now();
+
+    printf("Total run time: %f seconds\n", std::chrono::duration<double>(stop - start).count());
 
     return 0;
 }

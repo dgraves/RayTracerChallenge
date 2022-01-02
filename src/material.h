@@ -24,6 +24,9 @@
 
 #include "color.h"
 #include "double_util.h"
+#include "pattern.h"
+
+#include <memory>
 
 namespace rtc
 {
@@ -31,6 +34,7 @@ namespace rtc
     {
     public:
         Material() :
+            pattern_{},
             color_(GetDefaultColor()),
             ambient_(GetDefaultAmbient()),
             diffuse_(GetDefaultDiffuse()),
@@ -40,6 +44,7 @@ namespace rtc
         }
 
         Material(const Color& color, double ambient, double diffuse, double specular, double shininess) :
+            pattern_{},
             color_(color),
             ambient_(ambient),
             diffuse_(diffuse),
@@ -49,6 +54,7 @@ namespace rtc
         }
 
         Material(Color&& color, double ambient, double diffuse, double specular, double shininess) :
+            pattern_{},
             color_(std::move(color)),
             ambient_(ambient),
             diffuse_(diffuse),
@@ -56,6 +62,28 @@ namespace rtc
             shininess_(shininess)
         {
         }
+
+        Material(const std::shared_ptr<Pattern>& pattern, double ambient, double diffuse, double specular, double shininess) :
+            pattern_(pattern),
+            color_{},
+            ambient_(ambient),
+            diffuse_(diffuse),
+            specular_(specular),
+            shininess_(shininess)
+        {
+        }
+
+        Material(std::shared_ptr<Pattern>&& pattern, double ambient, double diffuse, double specular, double shininess) :
+            pattern_(std::move(pattern)),
+            color_{},
+            ambient_(ambient),
+            diffuse_(diffuse),
+            specular_(specular),
+            shininess_(shininess)
+        {
+        }
+
+        const std::shared_ptr<Pattern>& GetPattern() const { return pattern_; }
 
         const Color& GetColor() const { return color_; }
 
@@ -97,10 +125,11 @@ namespace rtc
         static double GetDefaultShininess() { return 200.0; };
 
     private:
-        Color  color_;     ///< Color attribute for the Phong reflection model.
-        double ambient_;   ///< Ambient attribute for the Phong reflection model.
-        double diffuse_;   ///< Diffuse attribute for the Phong reflection model.
-        double specular_;  ///< Specular attribute for the Phong reflection model.
-        double shininess_; ///< Shininess attribute for the Phong reflection model.
+        std::shared_ptr<Pattern> pattern_;     ///< Optional pattern attribute providing a color for the Phong reflection model.
+        Color                    color_;       ///< Optional color attribute for the Phong reflection model.
+        double                   ambient_;     ///< Ambient attribute for the Phong reflection model.
+        double                   diffuse_;     ///< Diffuse attribute for the Phong reflection model.
+        double                   specular_;    ///< Specular attribute for the Phong reflection model.
+        double                   shininess_;   ///< Shininess attribute for the Phong reflection model.
     };
 }

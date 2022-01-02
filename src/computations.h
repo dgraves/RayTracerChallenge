@@ -90,7 +90,7 @@ namespace rtc
 
                 for (const auto& light : lights)
                 {
-                    color.Add(Phong::Lighting(object_->GetMaterial(), light, over_point_, eye_, normal_, IsShadowed(world, light, over_point_)));
+                    color.Add(Phong::Lighting(object_->GetMaterial(), object_->GetInverseTransform(), light, over_point_, eye_, normal_, IsShadowed(world, light, over_point_)));
                 }
             }
 
